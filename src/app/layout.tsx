@@ -1,22 +1,23 @@
-'use client';
+// src/app/layout.tsx
+import '@/styles/globals.css';
+import { ReactNode } from 'react';
+import { Metadata } from 'next';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
-import { AnimatePresence, motion } from 'framer-motion';
-import { usePathname } from 'next/navigation';
+export const metadata: Metadata = {
+  title: 'Mahafuj Ahamed Portfolio',
+  description: 'Blockchain Developer Portfolio',
+};
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={pathname}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.3 }}
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
+    <html lang="en">
+      <body className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
+        <Header />
+        <main className="pt-20">{children}</main>
+        <Footer />
+      </body>
+    </html>
   );
 }

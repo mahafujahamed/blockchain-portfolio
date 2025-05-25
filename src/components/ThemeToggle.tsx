@@ -1,22 +1,45 @@
 'use client';
 
-import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
+import { Moon, Sun } from 'lucide-react';
 
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const [isDark, setIsDark] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    const html = document.documentElement;
+    const savedTheme = localStorage.getItem('theme');
 
-  if (!mounted) return null;
+    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.add('dark');
+      setIsDark(true);
+    } else {
+      html.classList.remove('dark');
+      setIsDark(false);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const html = document.documentElement;
+
+    if (html.classList.contains('dark')) {
+      html.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+      setIsDark(false);
+    } else {
+      html.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+      setIsDark(true);
+    }
+  };
 
   return (
     <button
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="p-2 text-sm rounded-md border border-gray-300 dark:border-gray-600"
+      onClick={toggleTheme}
+      aria-label="Toggle Dark Mode"
+      className="text-gray-600 dark:text-gray-300 hover:text-blue-500 transition"
     >
-      {theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}
+      {isDark ? <Sun size={20} /> : <Moon size={20} />}
     </button>
   );
 }

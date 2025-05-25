@@ -3,6 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import PageWrapper from '@/components/PageWrapper';
 
 type FormData = {
   name: string;
@@ -39,6 +40,7 @@ export default function ContactPage() {
   };
 
   return (
+    <PageWrapper>
     <section className="max-w-2xl mx-auto p-6 mt-16">
       {/* ✅ Success Modal */}
       {showSuccessModal && (
@@ -105,5 +107,6 @@ export default function ContactPage() {
         </button>
       </form>
     </section>
+    </PageWrapper>
   );
 }
