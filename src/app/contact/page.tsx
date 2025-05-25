@@ -3,7 +3,6 @@
 import { useForm } from 'react-hook-form';
 import toast, { Toaster } from 'react-hot-toast';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 
 type FormData = {
   name: string;
@@ -23,6 +22,7 @@ export default function ContactPage() {
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
 
@@ -38,10 +38,10 @@ export default function ContactPage() {
   };
 
   return (
-    <section className="max-w-2xl mx-auto p-6 mt-16">
+    <section className="max-w-2xl mx-auto px-4 py-20">
       <Toaster />
       <motion.h1
-        className="text-3xl font-bold mb-6 text-center dark:text-white"
+        className="text-3xl font-bold mb-10 text-center dark:text-white"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
