@@ -1,8 +1,8 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import toast, { Toaster } from 'react-hot-toast';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 
 type FormData = {
   name: string;
@@ -11,6 +11,8 @@ type FormData = {
 };
 
 export default function ContactPage() {
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -22,26 +24,40 @@ export default function ContactPage() {
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
 
       if (res.ok) {
-        toast.success('Message sent!');
+        setShowSuccessModal(true); // ✅ Trigger modal here
         reset();
       } else {
-        toast.error('Failed to send message.');
+        alert('Failed to send message.');
       }
     } catch (err) {
-      toast.error('Something went wrong!');
+      alert('Something went wrong!');
     }
   };
 
   return (
-    <section className="max-w-2xl mx-auto px-4 py-20">
-      <Toaster />
+    <section className="max-w-2xl mx-auto p-6 mt-16">
+      {/* ✅ Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center">
+            <h2 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Message Sent!</h2>
+            <p className="mb-4 text-gray-700 dark:text-gray-300">Thank you for contacting me.</p>
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
       <motion.h1
-        className="text-3xl font-bold mb-10 text-center dark:text-white"
+        className="text-3xl font-bold mb-6 text-center dark:text-white"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
