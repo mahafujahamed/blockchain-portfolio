@@ -1,10 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { adminAuth } from '@/lib/firebaseAdmin';
 
-export function middleware(request: NextRequest) {
-  const isLoggedIn = request.cookies.get('admin-auth')?.value === process.env.ADMIN_SECRET;
+export async function middleware(req: NextRequest) {
+  const token = req.cookies.get('token')?.value;
 
-  if (!isLoggedIn && request.nextUrl.pathname.startsWith('/admin')) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  const protectedPaths = ['/admin', '/admin/create', '/admin/edit'];
+
+  const isProtected = protectedPaths.some((path) =>
+    req.nextUrl.pathname.startsWith(path)
+  );
+
+  if (isProtected) {
+    try {
+      await adminAuth.verifyIdToken(token!);
+      return NextResponse.next();
+    } catch (error) {
+      return NextResponse.redirect(new URL('/admin/login', req.url));
+    }
   }
 
   return NextResponse.next();

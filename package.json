@@ -13,6 +13,8 @@
     "adminjs": "^7.8.16",
     "clsx": "^2.1.1",
     "express": "^5.1.0",
+    "firebase": "^11.8.1",
+    "firebase-admin": "^13.4.0",
     "framer-motion": "^12.12.1",
     "lucide-react": "^0.511.0",
     "mongodb": "^6.16.0",
