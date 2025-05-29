@@ -2,8 +2,11 @@
 import '@/styles/globals.css';
 import { ReactNode } from 'react';
 import { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Mahafuj Ahamed Portfolio',

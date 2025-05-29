@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import ThemeToggle from './ThemeToggle';
 import { useState, useEffect, useRef } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
@@ -30,14 +31,11 @@ export default function Header() {
   ];
 
   useEffect(() => {
-    const onScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
+    const onScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -48,26 +46,27 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const toggleMenu = () => setMenuOpen(prev => !prev);
-  const toggleDropdown = () => setDropdownOpen(prev => !prev);
-
   return (
     <header
       className={clsx(
         'w-full px-4 md:px-8 py-4 flex items-center justify-between fixed top-0 z-50 transition-all',
-        isScrolled
-          ? 'bg-white dark:bg-gray-900 shadow-md backdrop-blur-md'
-          : 'bg-transparent'
+        isScrolled ? 'bg-white dark:bg-gray-900 shadow-md backdrop-blur-md' : 'bg-transparent'
       )}
-      role="navigation"
-      aria-label="Main"
     >
-      <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">
-        Mahafuj Ahamed
+      <Link href="/" className="flex items-center gap-2">
+        <Image
+          src="/my-profile.png"
+          alt="Mahafuj Ahamed"
+          width={40}
+          height={40}
+          className="rounded-full border-2 border-white"
+          priority
+        />
+        <span className="text-xl font-bold text-gray-900 dark:text-white">Mahafuj Ahamed</span>
       </Link>
 
-      {/* Desktop Nav */}
-      <nav className="hidden md:flex gap-6 items-center" aria-label="Desktop menu">
+      {/* Desktop Navigation */}
+      <nav className="hidden md:flex gap-6 items-center">
         {navLinks.map((link) =>
           link.dropdown ? (
             <div
@@ -81,7 +80,6 @@ export default function Header() {
                 className="text-gray-700 dark:text-gray-200 hover:underline flex items-center"
                 aria-haspopup="true"
                 aria-expanded={dropdownOpen}
-                onClick={toggleDropdown}
               >
                 {link.label}
                 <ChevronDown className="ml-1 h-4 w-4" />
@@ -119,14 +117,13 @@ export default function Header() {
         <ThemeToggle />
       </nav>
 
-      {/* Mobile Nav Toggle */}
+      {/* Mobile Nav */}
       <div className="md:hidden">
-        <button onClick={toggleMenu} aria-label="Toggle menu">
+        <button onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
           {menuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {/* Mobile Nav Menu */}
       {menuOpen && (
         <div className="absolute top-16 left-0 right-0 bg-white dark:bg-gray-900 flex flex-col items-center gap-4 py-4 shadow-lg md:hidden">
           {navLinks.map((link) =>
