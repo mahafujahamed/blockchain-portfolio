@@ -1,47 +1,58 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
-type Post = {
-  _id: string;
+interface Post {
+  id: string;
   title: string;
-  createdAt: string;
-};
+  content: string;
+}
 
 export default function AdminDashboard() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      const res = await fetch('/api/posts');
-      const data = await res.json();
-      setPosts(data.posts);
-    };
-    fetchPosts();
+    fetch('/api/posts')
+      .then(res => res.json())
+      .then(data => setPosts(data));
   }, []);
 
+  const handleDelete = async (id: string) => {
+    await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+    setPosts(posts.filter(post => post.id !== id));
+  };
+
   return (
-    <div>
-      <Link href="/admin/create">
-        <button className="bg-blue-600 text-white px-4 py-2 rounded mb-4">Create New Post</button>
-      </Link>
-      <div className="space-y-4">
-        {posts.map((post) => (
-          <div key={post._id} className="p-4 border rounded shadow-sm bg-white">
-            <h2 className="text-lg font-semibold">{post.title}</h2>
-            <p className="text-sm text-gray-600">{new Date(post.createdAt).toLocaleDateString()}</p>
-            <div className="mt-2 space-x-2">
-              <Link href={`/admin/edit/${post._id}`}>
-                <button className="text-sm text-blue-600 hover:underline">Edit</button>
-              </Link>
-              <Link href={`/admin/delete/${post._id}`}>
-                <button className="text-sm text-red-600 hover:underline">Delete</button>
-              </Link>
-            </div>
-          </div>
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
+      <button
+        onClick={() => router.push('/admin/create')}
+        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded"
+      >
+        Create New Post
+      </button>
+      <ul>
+        {posts.map(post => (
+          <li key={post.id} className="mb-2">
+            <h2 className="text-xl font-semibold">{post.title}</h2>
+            <p>{post.content}</p>
+            <button
+              onClick={() => router.push(`/admin/edit/${post.id}`)}
+              className="mr-2 px-2 py-1 bg-yellow-500 text-white rounded"
+            >
+              Edit
+            </button>
+            <button
+              onClick={() => handleDelete(post.id)}
+              className="px-2 py-1 bg-red-500 text-white rounded"
+            >
+              Delete
+            </button>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }

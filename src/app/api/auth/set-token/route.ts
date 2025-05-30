@@ -1,9 +1,18 @@
-// app/api/auth/set-token/route.ts
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 
-export async function POST(request: Request) {
-  const { token } = await request.json();
-  cookies().set('token', token, { httpOnly: true, path: '/' });
+export const dynamic = 'force-dynamic';
+
+export async function POST(req: Request) {
+  const { token } = await req.json();
+
+  cookies().set('token', token, {
+    httpOnly: true,
+    path: '/',
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 60 * 60 * 24, // 1 day
+  });
+
   return NextResponse.json({ success: true });
 }
