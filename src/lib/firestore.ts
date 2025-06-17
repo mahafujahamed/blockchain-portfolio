@@ -1,8 +1,8 @@
 import { db } from './firebaseAdmin';
 
 export const getPosts = async () => {
-  const snapshot = await db.collection('posts').get();
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const snap = await db.collection('posts').orderBy('createdAt', 'desc').get();
+  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
 export const getPostById = async (id: string) => {
@@ -11,12 +11,13 @@ export const getPostById = async (id: string) => {
 };
 
 export const createPost = async (data: any) => {
-  const docRef = await db.collection('posts').add(data);
-  return docRef.id;
+  const now = new Date().toISOString();
+  const res = await db.collection('posts').add({ ...data, createdAt: now, updatedAt: now });
+  return res.id;
 };
 
 export const updatePost = async (id: string, data: any) => {
-  await db.collection('posts').doc(id).update(data);
+  await db.collection('posts').doc(id).update({ ...data, updatedAt: new Date().toISOString() });
 };
 
 export const deletePost = async (id: string) => {

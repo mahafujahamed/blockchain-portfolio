@@ -1,22 +1,22 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 
 export default function EditPost() {
+  const { id } = useParams();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const router = useRouter();
-  const { id } = useParams();
 
   useEffect(() => {
     fetch(`/api/posts/${id}`)
       .then(res => res.json())
       .then(data => {
+        if (data.error) return router.push('/admin');
         setTitle(data.title);
         setContent(data.content);
       });
-  }, [id]);
+  }, [id, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,11 +44,11 @@ export default function EditPost() {
           placeholder="Content"
           value={content}
           onChange={e => setContent(e.target.value)}
-          className="w-full p-2 border rounded"
+          className="w-full p-2 h-48 border rounded"
           required
         />
-        <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
-          Update
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+          Save Changes
         </button>
       </form>
     </div>
