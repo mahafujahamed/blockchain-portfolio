@@ -6,7 +6,7 @@ const Hero = () => {
     <section className="min-h-screen flex items-center justify-center text-center bg-gradient-to-b from-gray-900 to-black text-white px-4">
       <div className="max-w-2xl">
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
-          Hi, I'm <span className="text-blue-500">Mahafuj Ahamed</span>
+          Hi, I&apos;m <span className="text-blue-500">Mahafuj Ahamed</span>
         </h1>
         <p className="text-lg md:text-xl mb-8">
           A passionate <span className="text-blue-400">Blockchain Developer</span> specializing in Web3, Smart Contracts & dApps.

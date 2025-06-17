@@ -9,8 +9,32 @@ import Footer from '@/components/Footer';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Mahafuj Ahamed Portfolio',
-  description: 'Blockchain Developer Portfolio',
+  title: 'Mahafuj Ahamed | Blockchain Developer',
+  description: 'Portfolio of Mahafuj Ahamed – a blockchain and web3 developer creating secure, decentralized applications.',
+  keywords: ['blockchain developer', 'web3', 'Mahafuj Ahamed', 'Next.js portfolio', 'smart contracts', 'dapps'],
+  metadataBase: new URL('https://mahafujahamed.me'), // replace with your real domain
+  openGraph: {
+    title: 'Mahafuj Ahamed | Blockchain Developer',
+    description: 'Explore my portfolio showcasing blockchain projects, blogs, and smart contract work.',
+    url: 'https://mahafujahamed.me',
+    siteName: 'Mahafuj Portfolio',
+    images: [
+      {
+        url: '/og-image.png', // add this image in /public folder
+        width: 1200,
+        height: 630,
+        alt: 'Mahafuj Ahamed Portfolio',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Mahafuj Ahamed | Blockchain Developer',
+    description: 'Explore projects and blogs built by Mahafuj using blockchain, Ethereum, and Next.js.',
+    images: ['/og-image.png'],
+    creator: '@yourTwitterHandle', // optional
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -20,7 +20,7 @@ export default function About() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.6 }}
         >
-          I'm a passionate Blockchain Developer specializing in smart contracts,
+          I&apos;m a passionate Blockchain Developer specializing in smart contracts,
           decentralized applications (dApps), and Web3 integrations. I love building
           secure, scalable blockchain solutions and exploring the future of decentralized
           tech.
