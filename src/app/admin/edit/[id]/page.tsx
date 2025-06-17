@@ -1,54 +1,54 @@
+// src/app/admin/edit/[id]/page.tsx
 'use client';
-import { useEffect, useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 
 export default function EditPost() {
   const { id } = useParams();
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [form, setForm] = useState({ title: '', content: '', image: '' });
   const router = useRouter();
 
   useEffect(() => {
     fetch(`/api/posts/${id}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) return router.push('/admin');
-        setTitle(data.title);
-        setContent(data.content);
-      });
-  }, [id, router]);
+      .then((res) => res.json())
+      .then((data) => setForm({ title: data.title, content: data.content, image: data.image || '' }));
+  }, [id]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleUpdate = async (e: any) => {
     e.preventDefault();
     await fetch(`/api/posts/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, content }),
+      body: JSON.stringify(form),
     });
     router.push('/admin');
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Edit Post</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="p-6 max-w-2xl mx-auto">
+      <h1 className="text-xl font-bold mb-4">Edit Post</h1>
+      <form onSubmit={handleUpdate} className="space-y-4">
         <input
-          type="text"
-          placeholder="Title"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
+          value={form.title}
+          onChange={(e) => setForm({ ...form, title: e.target.value })}
           className="w-full p-2 border rounded"
           required
         />
         <textarea
-          placeholder="Content"
-          value={content}
-          onChange={e => setContent(e.target.value)}
-          className="w-full p-2 h-48 border rounded"
+          value={form.content}
+          onChange={(e) => setForm({ ...form, content: e.target.value })}
+          className="w-full p-2 h-40 border rounded"
           required
         />
+        <input
+          type="url"
+          value={form.image}
+          onChange={(e) => setForm({ ...form, image: e.target.value })}
+          className="w-full p-2 border rounded"
+        />
         <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-          Save Changes
+          Update Post
         </button>
       </form>
     </div>

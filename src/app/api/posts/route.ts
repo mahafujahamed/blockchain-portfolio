@@ -1,13 +1,42 @@
-import { NextResponse } from 'next/server';
-import { getPosts, createPost } from '@/lib/firestore';
+// src/app/api/posts/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { connectDB } from '@/lib/mongodb';
+import { verifyIdToken } from '@/lib/firebaseAdmin';
 
-export async function GET() {
-  const posts = await getPosts();
-  return NextResponse.json(posts);
-}
+export async function POST(req: NextRequest) {
+  try {
+    const token = req.cookies.get('token')?.value;
+    if (!token) {
+      return NextResponse.json({ error: 'Missing token' }, { status: 401 });
+    }
 
-export async function POST(req: Request) {
-  const data = await req.json();
-  const id = await createPost(data);
-  return NextResponse.json({ id });
+    const decoded = await verifyIdToken(token);
+    if (!decoded) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
+
+    const { title, content, image } = await req.json();
+
+    if (!title || !content || !image) {
+      return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+    }
+
+    const client = await connectDB();
+    const db = client.db();
+
+    const result = await db.collection('posts').insertOne({
+      title,
+      content,
+      image,
+      createdAt: new Date(),
+    });
+
+    return NextResponse.json(
+      { message: 'Post created', id: result.insertedId.toString() },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error('❌ POST /api/posts error:', error);
+    return NextResponse.json({ error: 'Failed to create post' }, { status: 500 });
+  }
 }
