@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   title: 'Mahafuj Ahamed | Blockchain Developer',
   description: 'Portfolio of Mahafuj Ahamed – a blockchain and web3 developer creating secure, decentralized applications.',
   keywords: ['blockchain developer', 'web3', 'Mahafuj Ahamed', 'Next.js portfolio', 'smart contracts', 'dapps'],
+  authors: [{ name: 'Mahafuj Ahamed' }],
+  robots: 'index, follow',
   metadataBase: new URL('https://mahafujahamed.me'), // replace with your real domain
   openGraph: {
     title: 'Mahafuj Ahamed | Blockchain Developer',
