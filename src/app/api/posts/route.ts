@@ -16,13 +16,11 @@ export async function POST(req: NextRequest) {
     }
 
     const { title, content, image } = await req.json();
-
     if (!title || !content || !image) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
 
-    const client = await connectDB();
-    const db = client.db();
+    const { db } = await connectDB();
 
     const result = await db.collection('posts').insertOne({
       title,
