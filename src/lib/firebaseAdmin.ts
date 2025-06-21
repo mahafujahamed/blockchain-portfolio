@@ -1,6 +1,8 @@
+// src/lib/firebaseAdmin.ts
+
 import admin from 'firebase-admin';
 
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY!);
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '{}');
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -8,11 +10,5 @@ if (!admin.apps.length) {
   });
 }
 
-export async function verifyIdToken(token: string) {
-  try {
-    const decoded = await admin.auth().verifyIdToken(token);
-    return decoded;
-  } catch {
-    return null;
-  }
-}
+export const adminAuth = admin.auth();
+export { admin };

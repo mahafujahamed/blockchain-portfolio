@@ -1,13 +1,15 @@
 // src/lib/authUtils.ts
-import admin from 'firebase-admin';
 
+import { adminAuth } from './firebaseAdmin';
 
-export async function verifyJWT(token: string | undefined) {
-  if (!token) return null;
+export async function verifyFirebaseAuth(token?: string | null): Promise<boolean> {
+  if (!token) return false;
+
   try {
-    const decoded = await admin.auth().verifyIdToken(token);
-    return decoded;
-  } catch {
-    return null;
+    await adminAuth.verifyIdToken(token);
+    return true;
+  } catch (error) {
+    console.error('JWT verification failed:', error);
+    return false;
   }
 }
