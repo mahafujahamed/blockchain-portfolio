@@ -1,20 +1,56 @@
-import { getPostBySlug } from '@/lib/getPostBySlug';
 import { notFound } from 'next/navigation';
+import { connectDB } from '@/lib/mongodb';
+import Post from '@/models/Post';
 
-interface Props {
+export default async function Page({
+  params,
+}: {
   params: { slug: string };
-}
+}) {
+  await connectDB();
 
-export default async function BlogPostPage({ params }: Props) {
-  const post = await getPostBySlug(params.slug);
+  const post = await Post.findOne({ slug: params.slug });
+
   if (!post) return notFound();
 
   return (
-    <article className="max-w-3xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
-      <p className="text-sm text-gray-600">{new Date(post.createdAt).toLocaleDateString()}</p>
-      <img src={post.image} alt={post.title} className="w-full h-64 object-cover rounded mt-4" />
-      <div className="mt-6 whitespace-pre-line">{post.content}</div>
-    </article>
+    <main className="max-w-3xl mx-auto p-6">
+      <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
+
+      {post.image && (
+        <img
+          src={post.image}
+          alt={post.title}
+          className="rounded-md mb-6 w-full object-cover"
+        />
+      )}
+
+      <article className="prose">
+        <p>{post.content}</p>
+      </article>
+    </main>
   );
+}
+
+// ✅ Use inline type — DO NOT reference external `Props` type
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  await connectDB();
+
+  const post = await Post.findOne({ slug: params.slug });
+
+  if (!post) {
+    return { title: 'Post Not Found' };
+  }
+
+  return {
+    title: `${post.title} | Blog`,
+    description: post.content?.slice(0, 160),
+    openGraph: {
+      images: post.image ? [post.image] : [],
+    },
+  };
 }

@@ -1,21 +1,21 @@
-import { MongoClient } from 'mongodb';
+// src/lib/mongodb.ts
 
-const uri = process.env.MONGODB_URI!;
-const options = {};
+import mongoose from 'mongoose';
 
-declare global {
-  var _mongoClientPromise: Promise<MongoClient> | undefined;
-}
+const MONGODB_URI = process.env.MONGODB_URI!;
 
-const client = new MongoClient(uri, options);
-
-if (!global._mongoClientPromise) {
-  global._mongoClientPromise = client.connect();
-}
-const clientPromise = global._mongoClientPromise;
+let cached = (global as any).mongoose || { conn: null, promise: null };
 
 export async function connectDB() {
-  const client = await clientPromise!;
-  const db = client.db(process.env.MONGODB_DB); // or null for default DB
-  return { client, db };
+  if (cached.conn) return cached.conn;
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(MONGODB_URI, {
+      dbName: 'portfolio',
+      bufferCommands: false,
+    }).then((mongoose) => mongoose);
+  }
+
+  cached.conn = await cached.promise;
+  return cached.conn;
 }

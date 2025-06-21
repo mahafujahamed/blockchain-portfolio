@@ -1,36 +1,75 @@
 // src/app/api/posts/[id]/route.ts
 
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import Post from '@/models/Post';
-import { verifyFirebaseAuth } from '@/lib/authUtils';
+import { adminAuth } from '@/lib/firebaseAdmin';
 
-export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
+function getIdFromRequest(req: NextRequest) {
+  // Extract id from the URL path: /api/posts/{id}
+  const url = new URL(req.url);
+  const segments = url.pathname.split('/');
+  return segments[segments.length - 1]; // last segment is id
+}
+
+export async function GET(req: NextRequest) {
+  const id = getIdFromRequest(req);
+
   await connectDB();
-  const post = await Post.findById(params.id);
-  if (!post) {
-    return new Response(JSON.stringify({ message: 'Post not found' }), { status: 404 });
+
+  try {
+    const post = await Post.findById(id);
+    if (!post) {
+      return NextResponse.json({ message: 'Post not found' }, { status: 404 });
+    }
+    return NextResponse.json(post, { status: 200 });
+  } catch (error) {
+    console.error('GET error:', error);
+    return NextResponse.json({ message: 'Failed to fetch post' }, { status: 500 });
   }
-  return new Response(JSON.stringify(post), { status: 200 });
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
-  const token = req.headers.get('authorization')?.split('Bearer ')[1];
-  const isVerified = await verifyFirebaseAuth(token);
-  if (!isVerified) return new Response('Unauthorized', { status: 401 });
+export async function PUT(req: NextRequest) {
+  const id = getIdFromRequest(req);
 
+  const token = req.headers.get('authorization')?.split('Bearer ')[1];
+  if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  try {
+    await adminAuth.verifyIdToken(token);
+  } catch (error) {
+    return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+  }
+
+  await connectDB();
   const data = await req.json();
-  await connectDB();
-  const updatedPost = await Post.findByIdAndUpdate(params.id, data, { new: true });
-  return new Response(JSON.stringify(updatedPost), { status: 200 });
+
+  try {
+    const updatedPost = await Post.findByIdAndUpdate(id, data, { new: true });
+    return NextResponse.json(updatedPost, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ message: 'Update failed' }, { status: 500 });
+  }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest) {
+  const id = getIdFromRequest(req);
+
   const token = req.headers.get('authorization')?.split('Bearer ')[1];
-  const isVerified = await verifyFirebaseAuth(token);
-  if (!isVerified) return new Response('Unauthorized', { status: 401 });
+  if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  try {
+    await adminAuth.verifyIdToken(token);
+  } catch (error) {
+    return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+  }
 
   await connectDB();
-  await Post.findByIdAndDelete(params.id);
-  return new Response(JSON.stringify({ message: 'Post deleted' }), { status: 200 });
+
+  try {
+    await Post.findByIdAndDelete(id);
+    return NextResponse.json({ message: 'Post deleted' }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ message: 'Delete failed' }, { status: 500 });
+  }
 }
