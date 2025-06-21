@@ -1,6 +1,6 @@
 // src/lib/authUtils.ts
 import admin from 'firebase-admin';
-import { NextRequest } from 'next/server';
+
 
 export async function verifyJWT(token: string | undefined) {
   if (!token) return null;
