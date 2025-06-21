@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import Link from 'next/link';
+
 
 const BlogPage = async () => {
   // Fetch blog posts from your MongoDB backend

@@ -1,6 +1,5 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { getAuth } from 'firebase-admin/auth';
 import { adminAuth } from '@/lib/firebaseAdmin';
 import jwt from 'jsonwebtoken';
 
@@ -13,7 +12,7 @@ export async function POST(req: Request) {
     });
     cookies().set('token', token, { httpOnly: true, path: '/' });
     return NextResponse.json({ success: true });
-  } catch (err) {
+  } catch (error) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 }

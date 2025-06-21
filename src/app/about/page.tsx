@@ -43,7 +43,7 @@ const AboutPage = () => {
           </p>
           <h1 className="text-4xl md:text-5xl font-extrabold mb-6">About Me</h1>
           <p className="text-lg leading-relaxed text-gray-700 dark:text-gray-300 mb-4">
-            I'm a passionate <strong className="text-pink-500">Blockchain Developer</strong> who
+            I&#39;m a passionate <strong className="text-pink-500">Blockchain Developer</strong> who
             builds smart contracts, DeFi protocols, and full-stack DApps using Solidity,
             TypeScript, and Next.js.
           </p>
@@ -86,7 +86,7 @@ const AboutPage = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
           >
-            I'm a passionate Blockchain Developer with expertise in building decentralized applications,
+            I&#39;m a passionate Blockchain Developer with expertise in building decentralized applications,
             smart contracts, and full-stack Web3 projects. My goal is to contribute to cutting-edge blockchain
             solutions and empower decentralization.
           </motion.p>
