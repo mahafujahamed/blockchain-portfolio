@@ -10,11 +10,20 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Mahafuj Ahamed | Blockchain Developer',
-  description: 'Portfolio of Mahafuj Ahamed – a blockchain and web3 developer creating secure, decentralized applications.',
-  keywords: ['Mahafuj Ahamed', 'web3', 'portfolio', 'blockchain developer', 'Next.js portfolio', 'smart contracts', 'dapps'],
+  description:
+    'Portfolio of Mahafuj Ahamed – a blockchain and web3 developer creating secure, decentralized applications.',
+  keywords: [
+    'Mahafuj Ahamed',
+    'web3',
+    'portfolio',
+    'blockchain developer',
+    'Next.js portfolio',
+    'smart contracts',
+    'dapps',
+  ],
   authors: [{ name: 'Mahafuj Ahamed' }],
   robots: 'index, follow',
-  metadataBase: new URL('https://mahafujahamed.me'), 
+  metadataBase: new URL('https://mahafujahamed.me'),
   openGraph: {
     title: 'Mahafuj Ahamed | Blockchain Developer',
     description: 'Explore my portfolio showcasing blockchain projects, blogs, and smart contract work.',
@@ -22,7 +31,7 @@ export const metadata: Metadata = {
     siteName: 'Mahafuj Ahamed Portfolio',
     images: [
       {
-        url: '/og-image.png', // add this image in /public folder
+        url: '/my-profile.png',
         width: 1200,
         height: 630,
         alt: 'Mahafuj Ahamed Portfolio',
@@ -34,14 +43,49 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Mahafuj Ahamed | Blockchain Developer',
     description: 'Explore projects and blogs built by Mahafuj using blockchain, Ethereum, and Next.js.',
-    images: ['/og-image.png'],
-    creator: '@yourTwitterHandle', // optional
+    images: ['/my-profile.png'],
+    creator: '@devmahafuj',
   },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        {/* ✅ Google Analytics (replace G-XXXXXXXXXX with your real GA ID) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-SHB7C800YK"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-SHB7C800YK');
+            `,
+          }}
+        />
+
+        {/* ✅ JSON-LD Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: "Mahafuj Ahamed",
+              url: "https://mahafujahamed.me",
+              image: "https://mahafujahamed.me/my-profile.png",
+              jobTitle: "Blockchain Developer",
+              sameAs: [
+                "https://github.com/mahafujahamed",
+                "https://www.linkedin.com/in/mahafuj-python",
+                "https://twitter.com/devmahafuj",
+                "https://www.facebook.com/share/14Eoi8pV6eN/"
+              ]
+            }),
+          }}
+        />
+      </head>
       <body className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
         <Header />
         <main className="pt-20">{children}</main>
