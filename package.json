@@ -3,12 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "postbuild": "next-sitemap",
-    "sitemap": "next-sitemap",
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "postbuild": "next-sitemap",
+    "start": "next start"
   },
   "dependencies": {
     "@adminjs/express": "^6.1.1",
