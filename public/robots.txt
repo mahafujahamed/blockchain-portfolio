@@ -4,3 +4,6 @@ Allow: /
 
 # Host
 Host: https://mahafujahamed.me
+
+# Sitemaps
+Sitemap: https://mahafujahamed.me/sitemap.xml

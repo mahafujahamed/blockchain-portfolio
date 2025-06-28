@@ -11,15 +11,15 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Mahafuj Ahamed | Blockchain Developer',
   description: 'Portfolio of Mahafuj Ahamed – a blockchain and web3 developer creating secure, decentralized applications.',
-  keywords: ['blockchain developer', 'web3', 'Mahafuj Ahamed', 'Next.js portfolio', 'smart contracts', 'dapps'],
+  keywords: ['Mahafuj Ahamed', 'web3', 'portfolio', 'blockchain developer', 'Next.js portfolio', 'smart contracts', 'dapps'],
   authors: [{ name: 'Mahafuj Ahamed' }],
   robots: 'index, follow',
-  metadataBase: new URL('https://mahafujahamed.me'), // replace with your real domain
+  metadataBase: new URL('https://mahafujahamed.me'), 
   openGraph: {
     title: 'Mahafuj Ahamed | Blockchain Developer',
     description: 'Explore my portfolio showcasing blockchain projects, blogs, and smart contract work.',
     url: 'https://mahafujahamed.me',
-    siteName: 'Mahafuj Portfolio',
+    siteName: 'Mahafuj Ahamed Portfolio',
     images: [
       {
         url: '/og-image.png', // add this image in /public folder

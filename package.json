@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "postbuild": "next-sitemap",
     "sitemap": "next-sitemap",
     "dev": "next dev --turbopack",
     "build": "next build",
