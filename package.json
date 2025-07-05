@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@adminjs/express": "^6.1.1",
+    "@headlessui/react": "^2.2.4",
     "adminjs": "^7.8.16",
     "clsx": "^2.1.1",
     "express": "^5.1.0",
@@ -27,10 +28,11 @@
     "nodemailer": "^7.0.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-hook-form": "^7.56.4",
+    "react-google-recaptcha": "^3.1.0",
+    "react-hook-form": "^7.60.0",
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0",
-    "resend": "^4.5.1"
+    "resend": "^4.6.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

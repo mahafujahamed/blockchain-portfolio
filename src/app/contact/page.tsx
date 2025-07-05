@@ -1,9 +1,9 @@
 'use client';
 
+import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
-import PageWrapper from '@/components/PageWrapper';
+import toast, { Toaster } from 'react-hot-toast';
+import ReCAPTCHA from 'react-google-recaptcha';  // Correct import
 
 type FormData = {
   name: string;
@@ -11,102 +11,121 @@ type FormData = {
   message: string;
 };
 
-export default function ContactPage() {
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+export const metadata = {
+  title: 'Contact | Mahafuj Ahamed',
+  description:
+    'Get in touch with Mahafuj Ahamed, blockchain & web3 developer. Reach out for collaboration or inquiries.',
+  keywords: ['Mahafuj Ahamed contact', 'blockchain developer contact', 'web3 developer', 'Next.js contact form'],
+  openGraph: {
+    title: 'Contact | Mahafuj Ahamed',
+    description: 'Let’s connect! I’d love to hear about your blockchain project.',
+    url: 'https://mahafujahamed.me/contact',
+    siteName: 'Mahafuj Ahamed Portfolio',
+    type: 'website',
+    images: [
+      {
+        url: '/my-profile.png',
+        width: 1200,
+        height: 630,
+        alt: 'Mahafuj Ahamed Contact',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Contact | Mahafuj Ahamed',
+    description: 'Reach out to Mahafuj Ahamed, a blockchain/web3 developer.',
+    creator: '@devmahafuj',
+    images: ['/my-profile.png'],
+  },
+};
 
+export default function ContactPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
     reset,
+    formState: { errors, isSubmitting },
   } = useForm<FormData>();
 
-  const onSubmit = async (data: FormData) => {
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
+  const recaptchaRef = useRef<ReCAPTCHA>(null); // ReCAPTCHA reference
+  const [loading, setLoading] = useState(false);
 
-      if (res.ok) {
-        setShowSuccessModal(true); // ✅ Trigger modal here
-        reset();
-      } else {
-        alert('Failed to send message.');
-      }
-    } catch (err) {
-      alert('Something went wrong!');
+  const onSubmit = async (data: FormData) => {
+    setLoading(true);
+    const token = await recaptchaRef.current?.executeAsync();
+    recaptchaRef.current?.reset();
+
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...data, token }),
+    });
+
+    const result = await res.json();
+
+    if (res.ok) {
+      toast.success('Message sent successfully!');
+      reset();
+    } else {
+      toast.error(result?.error || 'Something went wrong');
     }
+
+    setLoading(false);
   };
 
   return (
-    <PageWrapper>
-    <section className="max-w-2xl mx-auto p-6 mt-16">
-      {/* ✅ Success Modal */}
-      {showSuccessModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center">
-            <h2 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Message Sent!</h2>
-            <p className="mb-4 text-gray-700 dark:text-gray-300">Thank you for contacting me.</p>
-            <button
-              onClick={() => setShowSuccessModal(false)}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+    <section className="max-w-2xl mx-auto py-16 px-4">
+      <h1 className="text-4xl font-bold mb-6 text-center">Contact Me</h1>
 
-      <motion.h1
-        className="text-3xl font-bold mb-6 text-center dark:text-white"
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-6 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg"
       >
-        Contact Me
-      </motion.h1>
+        <input
+          type="text"
+          placeholder="Your Name"
+          {...register('name', { required: 'Name is required' })}
+          className="w-full px-4 py-3 border rounded-md dark:bg-gray-900"
+        />
+        {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div>
-          <input
-            type="text"
-            placeholder="Your Name"
-            {...register('name', { required: true })}
-            className="w-full p-3 rounded border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-          />
-          {errors.name && <p className="text-red-500 text-sm">Name is required</p>}
-        </div>
+        <input
+          type="email"
+          placeholder="Your Email"
+          {...register('email', {
+            required: 'Email is required',
+            pattern: { value: /^\S+@\S+$/i, message: 'Invalid email' },
+          })}
+          className="w-full px-4 py-3 border rounded-md dark:bg-gray-900"
+        />
+        {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
 
-        <div>
-          <input
-            type="email"
-            placeholder="Your Email"
-            {...register('email', { required: true })}
-            className="w-full p-3 rounded border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-          />
-          {errors.email && <p className="text-red-500 text-sm">Email is required</p>}
-        </div>
+        <textarea
+          rows={5}
+          placeholder="Your Message"
+          {...register('message', { required: 'Message is required' })}
+          className="w-full px-4 py-3 border rounded-md dark:bg-gray-900"
+        />
+        {errors.message && <p className="text-red-500 text-sm">{errors.message.message}</p>}
 
-        <div>
-          <textarea
-            rows={5}
-            placeholder="Your Message"
-            {...register('message', { required: true })}
-            className="w-full p-3 rounded border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-          />
-          {errors.message && <p className="text-red-500 text-sm">Message is required</p>}
-        </div>
+        {/* Invisible ReCAPTCHA */}
+        <ReCAPTCHA
+          sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+          size="invisible"
+          ref={recaptchaRef}
+        />
 
         <button
           type="submit"
-          disabled={isSubmitting}
-          className="bg-blue-600 text-white py-2 px-6 rounded hover:bg-blue-700 transition"
+          disabled={loading || isSubmitting}
+          className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition"
         >
-          {isSubmitting ? 'Sending...' : 'Send Message'}
+          {loading ? 'Sending...' : 'Send Message'}
         </button>
       </form>
+
+      <Toaster position="top-center" />
     </section>
-    </PageWrapper>
   );
 }
