@@ -3,8 +3,16 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
+// ✅ Define proper BlogPost type
+type BlogPost = {
+  _id: string;
+  slug: string;
+  title: string;
+  content: string;
+};
+
 export default function Blog() {
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<BlogPost[]>([]); // 👈 Use type here
 
   useEffect(() => {
     fetch('/api/posts')
@@ -19,12 +27,14 @@ export default function Blog() {
           Blog
         </h2>
         <div className="space-y-8">
-          {posts.map((post: any) => (
+          {posts.map((post) => (
             <div key={post._id}>
               <h3 className="text-2xl font-semibold text-blue-600">
                 <Link href={`/blog/${post.slug}`}>{post.title}</Link>
               </h3>
-              <p className="text-gray-600 dark:text-gray-300">{post.content.slice(0, 100)}...</p>
+              <p className="text-gray-600 dark:text-gray-300">
+                {post.content.slice(0, 100)}...
+              </p>
             </div>
           ))}
         </div>

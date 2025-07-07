@@ -2,25 +2,14 @@
 import '@/styles/globals.css';
 import { ReactNode } from 'react';
 import { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-
-const inter = Inter({ subsets: ['latin'] });
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'Mahafuj Ahamed | Blockchain Developer',
-  description:
-    'Portfolio of Mahafuj Ahamed – a blockchain and web3 developer creating secure, decentralized applications.',
-  keywords: [
-    'Mahafuj Ahamed',
-    'web3',
-    'portfolio',
-    'blockchain developer',
-    'Next.js portfolio',
-    'smart contracts',
-    'dapps',
-  ],
+  description: 'Portfolio of Mahafuj Ahamed – a blockchain and web3 developer creating secure, decentralized applications.',
+  keywords: ['Mahafuj Ahamed', 'web3', 'portfolio', 'blockchain developer', 'Next.js portfolio', 'smart contracts', 'dapps'],
   authors: [{ name: 'Mahafuj Ahamed' }],
   robots: 'index, follow',
   metadataBase: new URL('https://mahafujahamed.me'),
@@ -51,10 +40,15 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <head>
-        {/* ✅ Google Analytics (replace G-XXXXXXXXXX with your real GA ID) */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-SHB7C800YK"></script>
-        <script
+      <body className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
+        {/* ✅ Google Analytics (GA4) */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-SHB7C800YK"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
@@ -66,8 +60,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
 
         {/* ✅ JSON-LD Structured Data */}
-        <script
+        <Script
+          id="json-ld"
           type="application/ld+json"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
@@ -85,8 +81,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             }),
           }}
         />
-      </head>
-      <body className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
+
         <Header />
         <main className="pt-20">{children}</main>
         <Footer />

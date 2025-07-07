@@ -27,7 +27,7 @@ export async function POST(req: Request) {
       from: 'Mahafuj Contact <noreply@mahafujahamed.me>',
       to: ['mahafujahamed068@gmail.com'], // 🔁 replace with your real email
       subject: `New Contact Message from ${name}`,
-      reply_to: email,
+      replyTo: email,
       text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
     });
 
