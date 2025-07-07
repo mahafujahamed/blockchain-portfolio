@@ -1,18 +1,27 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { useForm } from 'react-hook-form';
 import { Dialog } from '@headlessui/react';
+import { useForm } from 'react-hook-form';
+import { useState, useRef } from 'react';
+import { motion } from 'framer-motion';
+import toast, { Toaster } from 'react-hot-toast';
 import ReCAPTCHA from 'react-google-recaptcha';
-import toast from 'react-hot-toast';
 
-type FormData = { name: string; email: string; message: string };
+type FormData = {
+  name: string;
+  email: string;
+  message: string;
+};
 
 export default function ContactModal() {
   const [isOpen, setIsOpen] = useState(false);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
-
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
     const token = await recaptchaRef.current?.executeAsync();
@@ -27,9 +36,9 @@ export default function ContactModal() {
     const result = await res.json();
 
     if (res.ok) {
-      toast.success('Message sent!');
+      toast.success('Message sent successfully!');
       reset();
-      setIsOpen(false); // Close modal after success
+      setIsOpen(false);
     } else {
       toast.error(result?.error || 'Something went wrong');
     }
@@ -38,50 +47,67 @@ export default function ContactModal() {
   return (
     <>
       <button
-        className="fixed bottom-6 right-6 z-50 bg-blue-600 text-white px-5 py-3 rounded-full shadow-lg hover:bg-blue-700 transition"
         onClick={() => setIsOpen(true)}
+        className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
       >
-        Contact Me
+        Let’s Talk
       </button>
 
-      <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="fixed inset-0 z-50 flex items-center justify-center">
-        <Dialog.Panel className="bg-white dark:bg-gray-900 rounded-xl p-6 w-full max-w-md shadow-lg">
-          <Dialog.Title className="text-2xl font-semibold mb-4">Contact Me</Dialog.Title>
+      <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="bg-white dark:bg-gray-800 p-8 max-w-lg w-full rounded-xl shadow-xl">
+            <Dialog.Title className="text-2xl font-bold mb-4">Contact Me</Dialog.Title>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <input
-              type="text"
-              placeholder="Name"
-              {...register('name', { required: 'Required' })}
-              className="w-full px-4 py-2 border rounded-md dark:bg-gray-800"
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              {...register('email', { required: 'Required' })}
-              className="w-full px-4 py-2 border rounded-md dark:bg-gray-800"
-            />
-            <textarea
-              placeholder="Message"
-              {...register('message', { required: 'Required' })}
-              className="w-full px-4 py-2 border rounded-md dark:bg-gray-800"
-              rows={4}
-            />
-            <ReCAPTCHA
-              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-              size="invisible"
-              ref={recaptchaRef}
-            />
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+            <motion.form
+              onSubmit={handleSubmit(onSubmit)}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-4"
             >
-              {isSubmitting ? 'Sending...' : 'Send Message'}
-            </button>
-          </form>
-        </Dialog.Panel>
+              <input
+                type="text"
+                placeholder="Your Name"
+                {...register('name', { required: 'Name is required' })}
+                className="w-full px-4 py-3 border rounded-md dark:bg-gray-900"
+              />
+              {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+
+              <input
+                type="email"
+                placeholder="Your Email"
+                {...register('email', {
+                  required: 'Email is required',
+                  pattern: { value: /^\S+@\S+$/, message: 'Invalid email' },
+                })}
+                className="w-full px-4 py-3 border rounded-md dark:bg-gray-900"
+              />
+              {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+
+              <textarea
+                rows={4}
+                placeholder="Your Message"
+                {...register('message', { required: 'Message is required' })}
+                className="w-full px-4 py-3 border rounded-md dark:bg-gray-900"
+              />
+              {errors.message && <p className="text-red-500 text-sm">{errors.message.message}</p>}
+
+              <ReCAPTCHA sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!} size="invisible" ref={recaptchaRef} />
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition w-full"
+              >
+                {isSubmitting ? 'Sending...' : 'Send Message'}
+              </button>
+            </motion.form>
+          </Dialog.Panel>
+        </div>
       </Dialog>
+
+      <Toaster position="top-center" />
     </>
   );
 }
