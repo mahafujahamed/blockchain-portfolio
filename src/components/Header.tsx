@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import ThemeToggle from './ThemeToggle';
+import ContactModal from './ContactModal';
 import { useState, useEffect, useRef } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -114,6 +115,10 @@ export default function Header() {
             </Link>
           )
         )}
+
+        {/* 🔘 Modal Trigger */}
+        <ContactModal />
+
         <ThemeToggle />
       </nav>
 
@@ -159,6 +164,10 @@ export default function Header() {
               </Link>
             )
           )}
+
+          {/* 🔘 Modal Trigger for Mobile */}
+          <ContactModal />
+
           <ThemeToggle />
         </div>
       )}

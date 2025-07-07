@@ -7,33 +7,31 @@ export async function POST(req: Request) {
   try {
     const { name, email, message, token } = await req.json();
 
-    if (!name || !email || !message || !token) {
-      return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
-    }
-
-    // Verify reCAPTCHA
-    const captchaVerify = await fetch(`https://www.google.com/recaptcha/api/siteverify`, {
+    // Optional: reCAPTCHA verification
+    const verifyRes = await fetch(`https://www.google.com/recaptcha/api/siteverify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`,
     });
 
-    const captchaResult = await captchaVerify.json();
-    if (!captchaResult.success) {
-      return NextResponse.json({ error: 'reCAPTCHA failed' }, { status: 400 });
+    const verifyData: { success: boolean } = await verifyRes.json();
+
+    if (!verifyData.success) {
+      return NextResponse.json({ error: 'reCAPTCHA verification failed' }, { status: 400 });
     }
 
-    await resend.emails.send({
-      from: 'Mahafuj Contact <noreply@mahafujahamed.me>',
-      to: ['mahafujahamed068@gmail.com'], // 🔁 replace with your real email
-      subject: `New Contact Message from ${name}`,
+    // Send email via Resend
+    const response = await resend.emails.send({
+      from: 'Contact Form <onboarding@resend.dev>',
+      to: ['mahafujahamed068@gmail.com'],
+      subject: `New message from ${name}`,
       replyTo: email,
-      text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
+      text: `Name: ${name}\nEmail: ${email}\nMessage:\n${message}`,
     });
 
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Error sending email:', error);
-    return NextResponse.json({ error: 'Failed to send message' }, { status: 500 });
+    return NextResponse.json({ success: true, data: response });
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: errMsg }, { status: 500 });
   }
 }
