@@ -1,37 +1,49 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: Request) {
   try {
     const { name, email, message, token } = await req.json();
 
-    // Optional: reCAPTCHA verification
-    const verifyRes = await fetch(`https://www.google.com/recaptcha/api/siteverify`, {
+    if (!name || !email || !message || !token) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    // ✅ reCAPTCHA validation
+    const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
+    const recaptchaRes = await fetch(`https://www.google.com/recaptcha/api/siteverify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`,
+      body: `secret=${recaptchaSecret}&response=${token}`,
     });
 
-    const verifyData: { success: boolean } = await verifyRes.json();
+    const recaptchaData = await recaptchaRes.json();
 
-    if (!verifyData.success) {
+    if (!recaptchaData.success) {
       return NextResponse.json({ error: 'reCAPTCHA verification failed' }, { status: 400 });
     }
 
-    // Send email via Resend
-    const response = await resend.emails.send({
-      from: 'Contact Form <onboarding@resend.dev>',
-      to: ['mahafujahamed068@gmail.com'],
-      subject: `New message from ${name}`,
-      replyTo: email,
-      text: `Name: ${name}\nEmail: ${email}\nMessage:\n${message}`,
+    // ✅ Send Email via Resend
+    const emailRes = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'Mahafuj Ahamed <onboarding@resend.dev>',
+        to: ['mahafujahamed068@gmail.com', 'yourother@example.com'],
+        subject: `New Contact from ${name}`,
+        reply_to: email, // ✅ Correct field
+        text: `Name: ${name}\nEmail: ${email}\nMessage:\n${message}`,
+      }),
     });
 
-    return NextResponse.json({ success: true, data: response });
-  } catch (error: unknown) {
-    const errMsg = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: errMsg }, { status: 500 });
+    if (!emailRes.ok) {
+      return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

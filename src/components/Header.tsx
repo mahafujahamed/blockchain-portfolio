@@ -28,7 +28,7 @@ export default function Header() {
     },
     { href: '/skills', label: 'Skills' },
     { href: '/blog', label: 'Blog' },
-    { href: '/contact', label: 'Contact' },
+    // { href: '/contact', label: 'Contact' },
   ];
 
   useEffect(() => {

@@ -16,7 +16,6 @@ type FormData = {
 export default function ContactModal() {
   const [isOpen, setIsOpen] = useState(false);
   const recaptchaRef = useRef<ReCAPTCHA | null>(null);
-
   const {
     register,
     handleSubmit,
@@ -25,28 +24,23 @@ export default function ContactModal() {
   } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
-    try {
-      const token = await recaptchaRef.current?.executeAsync();
-      recaptchaRef.current?.reset();
+    const token = await recaptchaRef.current?.executeAsync();
+    recaptchaRef.current?.reset();
 
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, token }),
-      });
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...data, token }),
+    });
 
-      const result = await res.json();
+    const result = await res.json();
 
-      if (res.ok) {
-        toast.success('Message sent successfully!');
-        reset();
-        setIsOpen(false);
-      } else {
-        toast.error(result?.error || 'Something went wrong');
-      }
-    } catch (err) {
-      console.error('Submission error:', err);
-      toast.error('Something went wrong');
+    if (res.ok) {
+      toast.success('Message sent successfully!');
+      reset();
+      setIsOpen(false);
+    } else {
+      toast.error(result?.error || 'Something went wrong');
     }
   };
 
@@ -56,16 +50,14 @@ export default function ContactModal() {
         onClick={() => setIsOpen(true)}
         className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
       >
-        Lets Talk
+        Let’s Talk
       </button>
 
       <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" />
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="bg-white dark:bg-gray-800 p-8 max-w-lg w-full rounded-xl shadow-xl">
-            <Dialog.Title className="text-2xl font-bold mb-4 text-center text-gray-800 dark:text-white">
-              Contact Me
-            </Dialog.Title>
+          <Dialog.Panel className="bg-white dark:bg-gray-900 p-8 max-w-lg w-full rounded-xl shadow-xl">
+            <Dialog.Title className="text-2xl font-bold mb-4 text-center">Contact Me</Dialog.Title>
 
             <motion.form
               onSubmit={handleSubmit(onSubmit)}
@@ -78,7 +70,7 @@ export default function ContactModal() {
                 type="text"
                 placeholder="Your Name"
                 {...register('name', { required: 'Name is required' })}
-                className="w-full px-4 py-3 border rounded-md dark:bg-gray-900"
+                className="w-full px-4 py-3 border rounded-md dark:bg-gray-800 dark:text-white"
               />
               {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
 
@@ -89,7 +81,7 @@ export default function ContactModal() {
                   required: 'Email is required',
                   pattern: { value: /^\S+@\S+$/, message: 'Invalid email' },
                 })}
-                className="w-full px-4 py-3 border rounded-md dark:bg-gray-900"
+                className="w-full px-4 py-3 border rounded-md dark:bg-gray-800 dark:text-white"
               />
               {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
 
@@ -97,14 +89,16 @@ export default function ContactModal() {
                 rows={4}
                 placeholder="Your Message"
                 {...register('message', { required: 'Message is required' })}
-                className="w-full px-4 py-3 border rounded-md dark:bg-gray-900"
+                className="w-full px-4 py-3 border rounded-md dark:bg-gray-800 dark:text-white"
               />
               {errors.message && <p className="text-red-500 text-sm">{errors.message.message}</p>}
 
               <ReCAPTCHA
                 sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
                 size="invisible"
-                ref={recaptchaRef}
+                ref={(el) => {
+                  recaptchaRef.current = el;
+                }}
               />
 
               <button
