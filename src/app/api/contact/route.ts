@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import clientPromise from '@/lib/mongodb';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -11,19 +12,51 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Captcha token missing' }, { status: 400 });
     }
 
-    // Optional: validate token via Google reCAPTCHA API (recommended in production)
-
-    const data = await resend.emails.send({
-      from: 'Portfolio Contact <noreply@mahafujahamed.me>',
-      to: ['mahafujahamed068@gmail.com'],
-      subject: `New message from ${name}`,
-      replyTo: email,
-      text: `Name: ${name}\nEmail: ${email}\nMessage:\n${message}`,
+    // ✅ Verify Google reCAPTCHA
+    const verifyRes = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`,
     });
 
-    return NextResponse.json({ success: true, data });
+    const captchaResult = await verifyRes.json();
+
+    if (!captchaResult.success) {
+      return NextResponse.json({ error: 'Captcha verification failed' }, { status: 400 });
+    }
+
+    // ✅ Save to MongoDB
+    const client = await clientPromise;
+    const db = client.db(process.env.MONGODB_DB);
+    const collection = db.collection('contacts');
+
+    const userIp = req.headers.get('x-forwarded-for') || 'Unknown IP';
+    const userAgent = req.headers.get('user-agent') || 'Unknown Agent';
+
+    await collection.insertOne({
+      name,
+      email,
+      message,
+      ip: userIp,
+      userAgent,
+      createdAt: new Date(),
+    });
+
+    // ✅ Send email via Resend
+    await resend.emails.send({
+      from: 'Portfolio <noreply@mahafujahamed.me>',
+      to: [
+        'mahafujahamed068@gmail.com', 
+        'second-email@example.com',   // Optional: add more recipients
+      ],
+      subject: `New Contact from ${name}`,
+      replyTo: email,
+      text: `Name: ${name}\nEmail: ${email}\nMessage:\n${message}\nIP: ${userIp}\nAgent: ${userAgent}`,
+    });
+
+    return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('Contact route error:', err);
+    console.error('Contact API Error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

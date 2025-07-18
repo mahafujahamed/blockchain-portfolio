@@ -5,11 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
-import dynamic from 'next/dynamic';
-import type { ReCAPTCHARef } from 'react-google-recaptcha';
-
-// ✅ Dynamically import ReCAPTCHA without SSR
-const ReCAPTCHADynamic = dynamic(() => import('react-google-recaptcha'), { ssr: false });
+import ReCAPTCHA from 'react-google-recaptcha';
 
 type FormData = {
   name: string;
@@ -19,7 +15,9 @@ type FormData = {
 
 export default function ContactModal() {
   const [isOpen, setIsOpen] = useState(false);
-  const recaptchaRef = useRef<ReCAPTCHARef>(null);
+
+  // ✅ Safe and working ref setup (bypasses missing type errors)
+  const recaptchaRef = useRef<any>(null);
 
   const {
     register,
@@ -30,13 +28,13 @@ export default function ContactModal() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const token = await recaptchaRef.current?.executeAsync();
-      recaptchaRef.current?.reset();
-
-      if (!token) {
-        toast.error('⚠️ reCAPTCHA failed. Try again.');
+      if (!recaptchaRef.current) {
+        toast.error('Captcha not loaded. Please try again.');
         return;
       }
+
+      const token = await recaptchaRef.current.executeAsync();
+      recaptchaRef.current.reset();
 
       const res = await fetch('/api/contact', {
         method: 'POST',
@@ -47,13 +45,14 @@ export default function ContactModal() {
       const result = await res.json();
 
       if (res.ok) {
-        toast.success('✅ Message sent!');
+        toast.success('Message sent successfully!');
         reset();
         setIsOpen(false);
       } else {
-        toast.error(result?.error || '❌ Something went wrong.');
+        toast.error(result?.error || 'Failed to send message.');
       }
-    } catch {
+    } catch (error: unknown) {
+      console.error('Contact form error:', error);
       toast.error('Unexpected error. Try again.');
     }
   };
@@ -93,7 +92,7 @@ export default function ContactModal() {
                 placeholder="Your Email"
                 {...register('email', {
                   required: 'Email is required',
-                  pattern: { value: /^\S+@\S+$/, message: 'Invalid email' },
+                  pattern: { value: /^\S+@\S+$/, message: 'Invalid email address' },
                 })}
                 className="w-full px-4 py-3 border rounded-md dark:bg-gray-900"
               />
@@ -107,11 +106,10 @@ export default function ContactModal() {
               />
               {errors.message && <p className="text-red-500 text-sm">{errors.message.message}</p>}
 
-              {/* ✅ Working Ref Setup */}
-              <ReCAPTCHADynamic
-                ref={recaptchaRef}
+              <ReCAPTCHA
                 sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
                 size="invisible"
+                ref={recaptchaRef}
               />
 
               <button

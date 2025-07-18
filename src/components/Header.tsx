@@ -28,7 +28,7 @@ export default function Header() {
     },
     { href: '/skills', label: 'Skills' },
     { href: '/blog', label: 'Blog' },
-    // { href: '/contact', label: 'Contact' },
+    // ContactModal will be used instead of '/contact' route
   ];
 
   useEffect(() => {
@@ -116,19 +116,20 @@ export default function Header() {
           )
         )}
 
-        {/* 🔘 Modal Trigger */}
+        {/* Contact Modal Button on Desktop */}
         <ContactModal />
 
         <ThemeToggle />
       </nav>
 
-      {/* Mobile Nav */}
+      {/* Mobile Nav Toggle */}
       <div className="md:hidden">
         <button onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
           {menuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
+      {/* Mobile Menu */}
       {menuOpen && (
         <div className="absolute top-16 left-0 right-0 bg-white dark:bg-gray-900 flex flex-col items-center gap-4 py-4 shadow-lg md:hidden">
           {navLinks.map((link) =>
@@ -165,7 +166,7 @@ export default function Header() {
             )
           )}
 
-          {/* 🔘 Modal Trigger for Mobile */}
+          {/* Contact Modal Button on Mobile */}
           <ContactModal />
 
           <ThemeToggle />
