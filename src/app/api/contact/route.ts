@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import clientPromise from '@/lib/mongodb';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+export const runtime = 'nodejs'; // Ensure Node.js runtime for this API
+
+const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export async function POST(req: Request) {
   try {
@@ -12,7 +14,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Captcha token missing' }, { status: 400 });
     }
 
-    // ✅ Verify Google reCAPTCHA
+    // ✅ Verify reCAPTCHA
     const verifyRes = await fetch('https://www.google.com/recaptcha/api/siteverify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -42,12 +44,12 @@ export async function POST(req: Request) {
       createdAt: new Date(),
     });
 
-    // ✅ Send email via Resend
+    // ✅ Send Email via Resend
     await resend.emails.send({
       from: 'Portfolio <noreply@mahafujahamed.me>',
       to: [
-        'mahafujahamed068@gmail.com', 
-        'second-email@example.com',   // Optional: add more recipients
+        'mahafujahamed068@gmail.com',
+        'mahafujahamed990@gmail.com', // Add more recipients here
       ],
       subject: `New Contact from ${name}`,
       replyTo: email,

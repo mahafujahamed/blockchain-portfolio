@@ -16,8 +16,8 @@ type FormData = {
 export default function ContactModal() {
   const [isOpen, setIsOpen] = useState(false);
 
-  // ✅ Safe and working ref setup (bypasses missing type errors)
-  const recaptchaRef = useRef<any>(null);
+  // ✅ Safe ref setup (TypeScript safe)
+  const recaptchaRef = useRef<ReCAPTCHA | null>(null);
 
   const {
     register,
@@ -29,7 +29,7 @@ export default function ContactModal() {
   const onSubmit = async (data: FormData) => {
     try {
       if (!recaptchaRef.current) {
-        toast.error('Captcha not loaded. Please try again.');
+        toast.error('Captcha not loaded.');
         return;
       }
 
@@ -45,14 +45,14 @@ export default function ContactModal() {
       const result = await res.json();
 
       if (res.ok) {
-        toast.success('Message sent successfully!');
+        toast.success('Message sent!');
         reset();
         setIsOpen(false);
       } else {
         toast.error(result?.error || 'Failed to send message.');
       }
-    } catch (error: unknown) {
-      console.error('Contact form error:', error);
+    } catch (err) {
+      console.error(err);
       toast.error('Unexpected error. Try again.');
     }
   };
@@ -92,7 +92,7 @@ export default function ContactModal() {
                 placeholder="Your Email"
                 {...register('email', {
                   required: 'Email is required',
-                  pattern: { value: /^\S+@\S+$/, message: 'Invalid email address' },
+                  pattern: { value: /^\S+@\S+$/, message: 'Invalid email' },
                 })}
                 className="w-full px-4 py-3 border rounded-md dark:bg-gray-900"
               />
