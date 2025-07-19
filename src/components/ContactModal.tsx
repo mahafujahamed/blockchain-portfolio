@@ -5,7 +5,8 @@ import { useForm } from 'react-hook-form';
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
-import ReCAPTCHA from 'react-google-recaptcha';
+import ReCAPTCHA, { ReCAPTCHARef } from 'react-google-recaptcha';
+
 
 type FormData = {
   name: string;
@@ -16,8 +17,8 @@ type FormData = {
 export default function ContactModal() {
   const [isOpen, setIsOpen] = useState(false);
 
-  // ✅ Safe ref setup (TypeScript safe)
-  const recaptchaRef = useRef<ReCAPTCHA | null>(null);
+  // ✅ Safe ReCAPTCHA ref setup (simplified & TypeScript safe)
+  const recaptchaRef = useRef<ReCAPTCHARef | null>(null);
 
   const {
     register,
@@ -33,8 +34,8 @@ export default function ContactModal() {
         return;
       }
 
-      const token = await recaptchaRef.current.executeAsync();
-      recaptchaRef.current.reset();
+      const token = await recaptchaRef.current?.executeAsync();
+      recaptchaRef.current?.reset();
 
       const res = await fetch('/api/contact', {
         method: 'POST',
@@ -106,6 +107,7 @@ export default function ContactModal() {
               />
               {errors.message && <p className="text-red-500 text-sm">{errors.message.message}</p>}
 
+              {/* ✅ Invisible reCAPTCHA */}
               <ReCAPTCHA
                 sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
                 size="invisible"

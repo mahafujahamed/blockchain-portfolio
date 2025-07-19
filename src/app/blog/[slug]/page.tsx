@@ -1,13 +1,17 @@
-import clientPromise from '@/lib/mongodb';
+import { connectDB } from '@/lib/mongoose';
 import { Post } from '@/models/Post';
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  const client = await clientPromise;
-  const db = client.db();
+export default async function BlogPostPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const resolvedParams = await params;
+  await connectDB();
+  const post = await Post.findOne({ slug: resolvedParams.slug });
 
-  const post = await Post.findOne({ slug: params.slug });
-
-  if (!post) return <div>Post not found</div>;
+  if (!post)
+    return <div className="p-8 text-red-500">Post not found</div>;
 
   return (
     <div className="max-w-4xl mx-auto p-8">

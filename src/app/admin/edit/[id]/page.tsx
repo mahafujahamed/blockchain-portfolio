@@ -1,70 +1,36 @@
-'use client';
+import { connectDB } from '@/lib/mongoose';
+import { Post } from '@/models/Post';
+import { notFound } from 'next/navigation';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+export default async function EditPostPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const resolvedParams = await params;
 
-export default function EditPost() {
-  const router = useRouter();
-  const { id } = useParams<{ id: string }>();
-  const [title, setTitle] = useState('');
-  const [slug, setSlug] = useState('');
-  const [content, setContent] = useState('');
+  await connectDB();
 
-  useEffect(() => {
-    fetch(`/api/posts/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setTitle(data.title);
-        setSlug(data.slug);
-        setContent(data.content);
-      });
-  }, [id]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
-
-    const res = await fetch(`/api/posts/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ title, slug, content }),
-    });
-
-    if (res.ok) router.push('/admin');
-    else alert('Failed to update post');
-  };
+  const post = await Post.findById(resolvedParams.id);
+  if (!post) return notFound();
 
   return (
-    <div className="max-w-xl mx-auto mt-20 p-4">
-      <h1 className="text-2xl mb-4">Edit Blog Post</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="max-w-xl mx-auto p-8">
+      <h1 className="text-2xl font-bold mb-4">Edit Post</h1>
+      <form className="space-y-4">
         <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="text"
-          value={slug}
-          onChange={(e) => setSlug(e.target.value)}
-          className="w-full p-2 border rounded"
+          name="title"
+          defaultValue={post.title}
+          className="w-full border px-4 py-2 rounded-md"
         />
         <textarea
-          rows={5}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="w-full p-2 border rounded"
+          name="content"
+          defaultValue={post.content}
+          rows={6}
+          className="w-full border px-4 py-2 rounded-md"
         />
-        <button
-          type="submit"
-          className="bg-green-600 text-white px-4 py-2 rounded"
-        >
-          Update Post
+        <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-md">
+          Save
         </button>
       </form>
     </div>
