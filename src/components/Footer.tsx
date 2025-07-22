@@ -12,7 +12,7 @@ export default function Footer() {
         <Link href="https://linkedin.com/in/mahafuj-python" target="_blank" aria-label="LinkedIn">
           <FaLinkedin className="hover:text-blue-700 dark:hover:text-blue-400" size={22} />
         </Link>
-        <Link href="https://twitter.com/yourusername" target="_blank" aria-label="Twitter">
+        <Link href="https://twitter.com/devmahafuj" target="_blank" aria-label="Twitter">
           <FaTwitter className="hover:text-blue-500 dark:hover:text-blue-300" size={22} />
         </Link>
       </div>
