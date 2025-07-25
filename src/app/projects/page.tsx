@@ -1,50 +1,51 @@
-'use client';
+// src/app/projects/page.tsx
 
-import { motion } from 'framer-motion';
+import Link from 'next/link';
 import Image from 'next/image';
-import PageWrapper from '@/components/PageWrapper';
+import { ProjectType } from '@/types/ProjectType';
 
-const projects = [
-  {
-    title: 'DeFi Dapp',
-    description: 'A decentralized finance application using Solidity and Web3.js.',
-    image: '/projects/project1.png',
-  },
-  {
-    title: 'NFT Marketplace',
-    description: 'A blockchain-based marketplace for buying and selling NFTs.',
-    image: '/projects/project2.png',
-  },
-];
+export const dynamic = 'force-dynamic';
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/projects`, {
+    cache: 'no-store',
+  });
+
+  if (!res.ok) {
+    return (
+      <div className="text-center mt-10 text-red-500">
+        Failed to load projects.
+      </div>
+    );
+  }
+
+  const projects: ProjectType[] = await res.json();
+
   return (
-    <PageWrapper>
-      <section className="min-h-screen py-16 px-4 md:px-12 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
-        <h1 className="text-4xl font-bold text-center mb-12">My Projects</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {projects.map((project, idx) => (
-            <motion.div
-              key={idx}
-              className="bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md p-6"
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-            >
-              <Image
-                src={project.image}
-                alt={project.title}
-                width={600}
-                height={400}
-                className="rounded-md mb-4"
-              />
-              <h2 className="text-xl font-semibold mb-2">{project.title}</h2>
-              <p className="text-gray-700 dark:text-gray-300">{project.description}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-    </PageWrapper>
+    <div className="max-w-6xl mx-auto p-8">
+      <h1 className="text-4xl font-bold mb-8">Projects</h1>
+
+      <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {projects.map((project) => (
+          <Link
+            key={project._id}
+            href={`/projects/${project.slug}`}
+            className="border rounded-xl p-4 hover:shadow-lg transition"
+          >
+            <Image
+              src={project.imageUrls?.[0] || '/placeholder.jpg'}
+              alt={project.title}
+              width={500}
+              height={300}
+              className="w-full h-48 object-cover rounded-lg mb-4"
+            />
+            <h2 className="text-xl font-semibold mb-2">{project.title}</h2>
+            <p className="text-gray-600 line-clamp-3">
+              {project.description}
+            </p>
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }

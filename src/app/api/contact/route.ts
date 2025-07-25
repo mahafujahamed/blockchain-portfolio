@@ -1,10 +1,26 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import clientPromise from '@/lib/mongodb';
+import { connectDB } from '@/lib/mongodb';
+import mongoose from 'mongoose';
 
-export const runtime = 'nodejs'; // Ensure Node.js runtime for this API
+export const runtime = 'nodejs';
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
+
+// Define Contact schema inline or import from models
+const contactSchema = new mongoose.Schema(
+  {
+    name: String,
+    email: String,
+    message: String,
+    ip: String,
+    userAgent: String,
+  },
+  { timestamps: true }
+);
+
+const Contact =
+  mongoose.models.Contact || mongoose.model('Contact', contactSchema);
 
 export async function POST(req: Request) {
   try {
@@ -27,33 +43,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Captcha verification failed' }, { status: 400 });
     }
 
-    // ✅ Save to MongoDB
-    const client = await clientPromise;
-    const db = client.db(process.env.MONGODB_DB);
-    const collection = db.collection('contacts');
+    // ✅ Connect to MongoDB and insert
+    await connectDB();
 
-    const userIp = req.headers.get('x-forwarded-for') || 'Unknown IP';
+    const ip = req.headers.get('x-forwarded-for') || 'Unknown IP';
     const userAgent = req.headers.get('user-agent') || 'Unknown Agent';
 
-    await collection.insertOne({
+    await Contact.create({
       name,
       email,
       message,
-      ip: userIp,
+      ip,
       userAgent,
-      createdAt: new Date(),
     });
 
-    // ✅ Send Email via Resend
+    // ✅ Send email via Resend
     await resend.emails.send({
       from: 'Portfolio <noreply@mahafujahamed.me>',
-      to: [
-        'mahafujahamed068@gmail.com',
-        'mahafujahamed990@gmail.com', // Add more recipients here
-      ],
+      to: ['mahafujahamed068@gmail.com', 'mahafujahamed990@gmail.com'],
       subject: `New Contact from ${name}`,
       replyTo: email,
-      text: `Name: ${name}\nEmail: ${email}\nMessage:\n${message}\nIP: ${userIp}\nAgent: ${userAgent}`,
+      text: `Name: ${name}\nEmail: ${email}\nMessage:\n${message}\nIP: ${ip}\nAgent: ${userAgent}`,
     });
 
     return NextResponse.json({ success: true });

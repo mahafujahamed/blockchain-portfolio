@@ -1,15 +1,14 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { verifyJwt } from '@/lib/jwt';
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const token = req.cookies.get('token')?.value;
 
-  if (req.nextUrl.pathname.startsWith('/admin') && req.nextUrl.pathname !== '/admin/login') {
-    if (!token || !verifyJwt(token)) {
-      return NextResponse.redirect(new URL('/admin/login', req.url));
-    }
+  if (!token) {
+    return NextResponse.redirect(new URL('/admin/login', req.url));
   }
+
+  // Do NOT verify token here — verification happens server-side in API routes or page server code
 
   return NextResponse.next();
 }

@@ -11,8 +11,10 @@
   "dependencies": {
     "@adminjs/express": "^6.1.1",
     "@headlessui/react": "^2.2.4",
+    "@hello-pangea/dnd": "^18.0.1",
     "adminjs": "^7.8.16",
     "bcryptjs": "^3.0.2",
+    "cloudinary": "^2.7.0",
     "clsx": "^2.1.1",
     "express": "^5.1.0",
     "firebase": "^11.8.1",
@@ -22,8 +24,10 @@
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.511.0",
     "mongodb": "^6.17.0",
-    "mongoose": "^8.16.4",
+    "mongoose": "^8.16.5",
+    "multer": "^2.0.2",
     "next": "15.3.2",
+    "next-cloudinary": "^6.16.0",
     "next-sitemap": "^4.2.3",
     "next-themes": "^0.4.6",
     "nodemailer": "^7.0.3",
@@ -33,12 +37,14 @@
     "react-hook-form": "^7.60.0",
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0",
-    "resend": "^4.7.0"
+    "resend": "^4.7.0",
+    "swr": "^2.3.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

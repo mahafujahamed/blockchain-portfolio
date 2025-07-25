@@ -1,30 +1,17 @@
 'use client';
 
+import useSWR from 'swr';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
-const projects = [
-  {
-    title: 'NFT Marketplace',
-    description: 'A decentralized NFT platform built with Solidity, Next.js, and IPFS.',
-    image: '/projects/nft-marketplace.png',
-    link: 'https://github.com/yourname/nft-marketplace',
-  },
-  {
-    title: 'DeFi Staking App',
-    description: 'Smart contract-based staking platform for ERC-20 tokens.',
-    image: '/projects/defi-staking.png',
-    link: 'https://github.com/yourname/defi-staking',
-  },
-  {
-    title: 'DAO Voting System',
-    description: 'On-chain voting app using Solidity and Snapshot integration.',
-    image: '/projects/dao-voting.png',
-    link: 'https://github.com/yourname/dao-voting',
-  },
-];
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Projects() {
+  const { data: projects, error, isLoading } = useSWR('/api/projects', fetcher);
+
+  if (isLoading) return <p className="text-center py-10">Loading projects...</p>;
+  if (error) return <p className="text-center text-red-500 py-10">Failed to load projects.</p>;
+
   return (
     <section className="py-16 bg-white dark:bg-gray-950">
       <div className="max-w-6xl mx-auto px-4">
@@ -36,10 +23,11 @@ export default function Projects() {
         >
           Projects
         </motion.h2>
+
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project, index) => (
+          {projects.map((project: any, index: number) => (
             <motion.div
-              key={index}
+              key={project._id}
               className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 shadow hover:shadow-lg transition"
               whileHover={{ scale: 1.03 }}
               initial={{ opacity: 0, y: 30 }}
@@ -47,23 +35,29 @@ export default function Projects() {
               transition={{ delay: index * 0.2 }}
             >
               <Image
-                src={project.image}
+                src={project.imageUrls?.[0] || '/placeholder.jpg'}
                 alt={project.title}
                 width={600}
                 height={300}
                 className="w-full h-48 object-cover"
               />
               <div className="p-6">
-                <h3 className="text-xl font-semibold text-blue-600 mb-2">{project.title}</h3>
-                <p className="text-gray-700 dark:text-gray-300 mb-4">{project.description}</p>
-                <a
-                  href={project.link}
-                  className="text-blue-500 hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View Project →
-                </a>
+                <h3 className="text-xl font-semibold text-blue-600 mb-2">
+                  {project.title}
+                </h3>
+                <p className="text-gray-700 dark:text-gray-300 mb-4">
+                  {project.description}
+                </p>
+                {project.liveUrl && (
+                  <a
+                    href={project.liveUrl}
+                    className="text-blue-500 hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View Project →
+                  </a>
+                )}
               </div>
             </motion.div>
           ))}

@@ -1,21 +1,17 @@
-import { MongoClient } from 'mongodb';
+import mongoose from 'mongoose';
 
-const uri = process.env.MONGODB_URI!;
-const options = {};
+let isConnected = false;
 
-// Extend the globalThis type to hold the client promise
-declare global {
-  // eslint-disable-next-line no-var
-  var _mongoClientPromise: Promise<MongoClient> | undefined;
-}
+export const connectDB = async (): Promise<void> => {
+  if (isConnected) return;
 
-let client: MongoClient;
-
-if (!globalThis._mongoClientPromise) {
-  client = new MongoClient(uri, options);
-  globalThis._mongoClientPromise = client.connect();
-}
-
-const clientPromise = globalThis._mongoClientPromise!;
-
-export default clientPromise;
+  try {
+    await mongoose.connect(process.env.MONGODB_URI!, {
+      dbName: 'portfolio',
+    });
+    isConnected = true;
+    console.log('🟢 MongoDB connected');
+  } catch (err) {
+    console.error('🔴 MongoDB connection error', err);
+  }
+};
