@@ -11,7 +11,6 @@ export default async function AdminProjectsPage() {
   return (
     <div>
       <AdminNavbar />
-
       <div className="max-w-5xl mx-auto py-10 px-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Projects</h1>

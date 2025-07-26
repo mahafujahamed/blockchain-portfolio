@@ -1,17 +1,20 @@
 import { getAuth } from 'firebase-admin/auth';
 import { NextRequest } from 'next/server';
-import { firebaseAdmin } from './firebaseAdmin';
+
 
 export async function verifyAuthToken(req: NextRequest) {
   const authHeader = req.headers.get('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) return null;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null;
+  }
 
-  const token = authHeader.split('Bearer ')[1];
+  const token = authHeader.split(' ')[1];
+
   try {
-    const decoded = await getAuth(firebaseAdmin).verifyIdToken(token);
-    return decoded;
+    const decodedToken = await getAuth().verifyIdToken(token);
+    return decodedToken;
   } catch (error) {
-    console.error('JWT verification failed:', error);
+    console.error('Token verification failed:', error);
     return null;
   }
 }

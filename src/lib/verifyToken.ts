@@ -1,10 +1,11 @@
-'use server';
+// src/lib/verifyToken.ts
+'use server'; // ✅ REQUIRED FOR SERVER CONTEXT
 
-import { cookies as getCookies } from 'next/headers';
+import { cookies } from 'next/headers';
 import { adminAuth } from './firebaseAdmin';
 
 export const verifyToken = async () => {
-  const cookieStore = getCookies(); // ✅ avoid naming conflict
+  const cookieStore = await cookies(); // ✅ NOT async
   const token = cookieStore.get('token')?.value;
 
   if (!token) {
@@ -14,8 +15,8 @@ export const verifyToken = async () => {
   try {
     const decodedToken = await adminAuth.verifyIdToken(token);
     return decodedToken;
-  } catch (err) {
-    console.error('Token verification failed:', err instanceof Error ? err.message : err);
-    throw new Error('Unauthorized: Invalid token');
+  } catch (error) {
+    console.error('Token verification failed:', error);
+    throw new Error('Invalid or expired token');
   }
 };
