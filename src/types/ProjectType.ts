@@ -1,9 +1,14 @@
-// src/types/ProjectType.ts
-export type ProjectType = {
-  _id: string;
+// types/projectType.ts
+
+export interface ProjectType {
+  _id?: string; // MongoDB document ID (optional when creating)
   title: string;
   description: string;
-  slug: string;
-  imageUrls?: string[];
-  // add more fields as needed
-};
+  imageUrl?: string;
+  githubUrl?: string;
+  liveUrl?: string;
+  techStack?: string[];
+  category?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}

@@ -2,6 +2,8 @@ import { connectDB } from '@/lib/mongoose';
 import { Post } from '@/models/Post';
 import Link from 'next/link';
 
+export const runtime = "nodejs";
+
 export default async function BlogPage() {
   await connectDB();
   const posts = await Post.find().sort({ createdAt: -1 });

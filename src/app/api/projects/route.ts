@@ -1,23 +1,36 @@
-import { NextResponse } from 'next/server';
-import { connectDB } from '@/lib/mongodb';
-import ProjectModel from '@/models/Project';
-import { verifyToken } from '@/lib/verifyToken';
+import { connectDB } from "@/lib/mongoose";
+import Project from "@/lib/models/Project";
+import { verifyFirebaseToken } from "@/lib/firebaseAdmin";
+import { NextResponse } from "next/server";
 
+export const runtime = "nodejs";
+
+// GET ALL PROJECTS
 export async function GET() {
-  await connectDB();
-  const projects = await ProjectModel.find().sort({ createdAt: -1 });
-  return NextResponse.json(projects);
+  try {
+    await connectDB();
+    const projects = await Project.find().sort({ createdAt: -1 });
+    return NextResponse.json(projects, { status: 200 });
+  } catch (error) {
+    console.error("Fetch projects error:", error);
+    return NextResponse.json({ message: "Failed to fetch projects" }, { status: 500 });
+  }
 }
 
+// CREATE NEW PROJECT
 export async function POST(req: Request) {
-  await verifyToken();
-  await connectDB();
+  const token = req.headers.get("authorization")?.split("Bearer ")[1];
+  if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-  const data = await req.json();
   try {
-    const newProject = await ProjectModel.create(data);
-    return NextResponse.json(newProject);
-  } catch (err) {
-    return NextResponse.json({ message: 'Create failed' }, { status: 500 });
+    await verifyFirebaseToken(token);
+    const body = await req.json();
+
+    await connectDB();
+    const newProject = await Project.create(body);
+    return NextResponse.json(newProject, { status: 201 });
+  } catch (error) {
+    console.error("Project POST error:", error);
+    return NextResponse.json({ message: "Failed to create project" }, { status: 500 });
   }
 }

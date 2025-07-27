@@ -1,15 +1,19 @@
-import mongoose from 'mongoose';
-
-const MONGODB_URI = process.env.MONGODB_URI!;
-
-if (!MONGODB_URI) {
-  throw new Error('MONGODB_URI is missing in .env');
-}
+// src/lib/mongoose.ts
+import mongoose from "mongoose";
 
 let isConnected = false;
 
-export async function connectDB() {
+export const connectDB = async () => {
   if (isConnected) return;
-  await mongoose.connect(MONGODB_URI, { dbName: process.env.MONGODB_DB });
-  isConnected = true;
-}
+
+  try {
+    await mongoose.connect(process.env.MONGODB_URI || "", {
+      dbName: "postdb",
+    });
+    isConnected = true;
+    console.log("MongoDB connected");
+  } catch (error) {
+    console.error("MongoDB connection failed:", error);
+    throw error;
+  }
+};

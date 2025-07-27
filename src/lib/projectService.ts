@@ -1,21 +1,12 @@
-import { connectDB } from './mongodb';
-import ProjectModel from '@/models/Project';
+export interface ProjectSummary {
+  _id: string;
+  title: string;
+  description: string;
+  imageUrls?: string[];
+}
 
-export async function getAllProjects() {
-  await connectDB();
-
-  const projects = await ProjectModel.find().lean();
-
-  return projects.map((project: any) => ({
-    _id: project._id.toString(),
-    title: project.title,
-    description: project.description,
-    image: project.image,
-    url: project.url,
-    github: project.github,
-    createdAt: project.createdAt?.toISOString?.() || '',
-    imageUrls: project.imageUrls || [],
-    live: project.live ?? false,
-    techStack: project.techStack || [],
-  }));
+export async function getAllProjects(): Promise<ProjectSummary[]> {
+  const res = await fetch('/api/projects');
+  if (!res.ok) throw new Error('Failed fetching projects');
+  return res.json();
 }

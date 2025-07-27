@@ -1,6 +1,8 @@
 import { connectDB } from '@/lib/mongoose';
 import { Post } from '@/models/Post';
 
+export const runtime = "nodejs";
+
 export default async function BlogPostPage({
   params,
 }: {

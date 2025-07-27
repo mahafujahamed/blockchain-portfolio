@@ -1,22 +1,20 @@
 // src/lib/verifyToken.ts
-'use server'; // ✅ REQUIRED FOR SERVER CONTEXT
-
 import { cookies } from 'next/headers';
 import { adminAuth } from './firebaseAdmin';
 
 export const verifyToken = async () => {
-  const cookieStore = await cookies(); // ✅ NOT async
-  const token = cookieStore.get('token')?.value;
+  const cookieStore = cookies();
+  const tokenCookie = cookieStore.get('token');
 
-  if (!token) {
-    throw new Error('Unauthorized: No token found in cookies');
+  if (!tokenCookie?.value) {
+    throw new Error('Unauthorized: No token found');
   }
 
   try {
-    const decodedToken = await adminAuth.verifyIdToken(token);
+    const decodedToken = await adminAuth.verifyIdToken(tokenCookie.value);
     return decodedToken;
   } catch (error) {
     console.error('Token verification failed:', error);
-    throw new Error('Invalid or expired token');
+    throw new Error('Unauthorized: Invalid token');
   }
 };

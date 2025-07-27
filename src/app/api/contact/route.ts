@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { connectDB } from '@/lib/mongodb';
+import { connectDB } from '@/lib/mongoose';
 import mongoose from 'mongoose';
 
 export const runtime = 'nodejs';
