@@ -11,6 +11,7 @@ out
 .env.*.local
 
 # Firebase service account
+
 server/firebase-admin.json
 
 
