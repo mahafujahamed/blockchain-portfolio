@@ -1,151 +1,84 @@
-'use client';
+import Image from "next/image";
+import { Metadata } from "next";
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import Link from 'next/link';
-import '@/styles/about.css';
-
-const tabs = ['Bio', 'Experience', 'Education'];
-
-const AboutPage = () => {
-  const [activeTab, setActiveTab] = useState('Bio');
-
-  return (
-    <div className="min-h-screen pt-24 px-4 md:px-16 bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
-
-      {/* --- About Hero Section --- */}
-      <section className="grid grid-cols-1 md:grid-cols-2 items-center gap-10 mb-16">
-        {/* Left: Image */}
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-          className="flex justify-center"
-        >
-          <Image
-            src="/my-profile.png" // Make sure this image exists in /public
-            alt="Profile"
-            width={450}
-            height={450}
-            className="rounded-lg shadow-lg object-cover"
-          />
-        </motion.div>
-
-        {/* Right: Text Content */}
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <p className="text-sm text-pink-600 font-semibold uppercase mb-2">
-            Visit My Portfolio & Hire Me
-          </p>
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-6">About Me</h1>
-          <p className="text-lg leading-relaxed text-gray-700 dark:text-gray-300 mb-4">
-            I&#39;m a passionate <strong className="text-pink-500">Blockchain Developer</strong> who
-            builds smart contracts, DeFi protocols, and full-stack DApps using Solidity,
-            TypeScript, and Next.js.
-          </p>
-          <p className="text-lg leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-            My tech stack includes <strong>Solidity</strong>, <strong>Next.js</strong>,{' '}
-            <strong>MongoDB</strong>, and <strong>Tailwind CSS</strong>. Always learning!
-          </p>
-          <Link
-            href="/Mahafuj-Ahamed-CV.pdf"
-            download
-            className="inline-block bg-pink-600 text-white px-6 py-3 rounded hover:bg-pink-700 transition font-semibold text-sm"
-          >
-            Download My CV
-          </Link>
-        </motion.div>
-      </section>
-
-      {/* --- Tabs Section --- */}
-      <div className="flex justify-center space-x-4 mb-8">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-md font-medium transition-colors ${
-              activeTab === tab
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 dark:bg-gray-700 dark:text-white'
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      {/* --- Tab Content --- */}
-      <div className="text-lg dark:text-gray-300 mb-12">
-        {activeTab === 'Bio' && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-          >
-            I&#39;m a passionate Blockchain Developer with expertise in building decentralized applications,
-            smart contracts, and full-stack Web3 projects. My goal is to contribute to cutting-edge blockchain
-            solutions and empower decentralization.
-          </motion.p>
-        )}
-
-        {activeTab === 'Experience' && (
-          <motion.ul
-            className="timeline list-disc ml-5"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-          >
-            <li><span className="font-semibold">2024</span> – Intern at Chainlink Labs</li>
-            <li><span className="font-semibold">2023</span> – Built DeFi staking DApp on Ethereum</li>
-            <li><span className="font-semibold">2022</span> – Freelance Web3 Developer (Solidity & React)</li>
-          </motion.ul>
-        )}
-
-        {activeTab === 'Education' && (
-          <motion.ul
-            className="timeline list-disc ml-5"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-          >
-            <li><span className="font-semibold">2022</span> – B.Sc in Computer Science</li>
-            <li><span className="font-semibold">2021</span> – Solidity Bootcamp (Alchemy)</li>
-          </motion.ul>
-        )}
-      </div>
-
-      {/* --- Skills Section --- */}
-      <div className="mt-12">
-        <h2 className="text-2xl font-semibold mb-4 dark:text-white">Tech Skills</h2>
-        {[
-          { name: 'Solidity', value: 90 },
-          { name: 'React.js / Next.js', value: 85 },
-          { name: 'TypeScript', value: 80 },
-          { name: 'MongoDB', value: 75 },
-          { name: 'Tailwind CSS', value: 90 },
-        ].map((skill) => (
-          <div key={skill.name} className="mb-4">
-            <div className="flex justify-between">
-              <span>{skill.name}</span>
-              <span>{skill.value}%</span>
-            </div>
-            <div className="w-full h-3 bg-gray-300 dark:bg-gray-700 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-blue-500 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${skill.value}%` }}
-                transition={{ duration: 1 }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+export const metadata: Metadata = {
+  title: "About – Mahafuj Ahamed | Blockchain Developer",
+  description: "Learn more about Mahafuj Ahamed, a full-stack blockchain developer specializing in smart contracts, DApps, and secure web3 systems.",
+  keywords: ["Mahafuj Ahamed", "Blockchain Developer", "Web3", "Smart Contracts", "Portfolio"],
 };
 
-export default AboutPage;
+export default function AboutPage() {
+  return (
+    <main className="max-w-4xl mx-auto px-6 py-16">
+      <h1 className="text-4xl font-bold mb-4 text-center">👋 About Me</h1>
+
+      <section className="mb-10 text-lg text-gray-800">
+        <p className="mb-4">
+          I’m <strong>Mahafuj Ahamed</strong>, a full-stack blockchain developer passionate about building secure, scalable, and user-friendly Web3 applications.
+          With experience in Ethereum, Solidity, smart contract auditing, DApp integration, and backend APIs — I turn ideas into decentralized reality.
+        </p>
+        <p>
+          My mission is to push the boundaries of blockchain development by building fast, secure, and future-ready decentralized applications.
+        </p>
+      </section>
+
+      {/* 🛠 Tech Stack */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-semibold mb-4">🛠 Tech Stack</h2>
+        <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-gray-700">
+          <li>Solidity</li>
+          <li>Hardhat</li>
+          <li>Ethereum</li>
+          <li>Next.js</li>
+          <li>MongoDB</li>
+          <li>Firebase Auth</li>
+          <li>Node.js</li>
+          <li>Tailwind CSS</li>
+          <li>TypeScript</li>
+          <li>IPFS</li>
+        </ul>
+      </section>
+
+      {/* 🕓 Timeline / Experience */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-semibold mb-4">🕓 Experience & Timeline</h2>
+        <div className="space-y-4 border-l pl-6">
+          <div>
+            <h3 className="font-semibold">2024 – Built Smart Contract Portfolio System</h3>
+            <p className="text-sm text-gray-600">Created a full CRUD portfolio admin with Firebase, JWT, and MongoDB for blockchain projects.</p>
+          </div>
+          <div>
+            <h3 className="font-semibold">2023 – Deployed NFT Minting DApp</h3>
+            <p className="text-sm text-gray-600">Launched an NFT project using ERC-721 contracts on Polygon with marketplace integration.</p>
+          </div>
+          <div>
+            <h3 className="font-semibold">2022 – Freelanced as Smart Contract Developer</h3>
+            <p className="text-sm text-gray-600">Audited Solidity contracts, built token vesting logic and launchpad backend systems.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* 🎓 Certifications */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-semibold mb-4">🎓 Certifications</h2>
+        <ul className="list-disc pl-6 text-gray-700">
+          <li>Certified Blockchain Developer™ – Blockchain Council</li>
+          <li>Ethereum Smart Contracts – Coursera</li>
+          <li>Chainlink Hackathon 2024 Finalist</li>
+        </ul>
+      </section>
+
+      {/* 📄 Resume Download */}
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">📄 Download Resume</h2>
+        <a
+          href="/Mahafuj-Ahamed-Resume.pdf"
+          download
+          className="inline-block bg-indigo-600 text-white px-5 py-3 rounded hover:bg-indigo-700"
+        >
+          Download PDF
+        </a>
+      </section>
+    </main>
+  );
+}

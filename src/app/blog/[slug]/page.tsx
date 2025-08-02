@@ -1,24 +1,45 @@
-import { connectDB } from '@/lib/mongoose';
-import { Post } from '@/models/Post';
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
 
-export const runtime = "nodejs";
-
-export default async function BlogPostPage({
+export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
-}) {
-  const resolvedParams = await params;
-  await connectDB();
-  const post = await Post.findOne({ slug: resolvedParams.slug });
+  params: { slug: string };
+}): Promise<Metadata> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/posts/${params.slug}`, {
+    next: { revalidate: 60 },
+  });
 
-  if (!post)
-    return <div className="p-8 text-red-500">Post not found</div>;
+  if (!res.ok) return {};
+
+  const post = await res.json();
+  return {
+    title: `${post.title} – Mahafuj Ahamed`,
+    description: post.description || post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.description || post.excerpt,
+    },
+  };
+}
+
+export default async function PostPage({ params }: { params: { slug: string } }) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/posts/${params.slug}`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) return notFound();
+
+  const post = await res.json();
 
   return (
-    <div className="max-w-4xl mx-auto p-8">
-      <h1 className="text-3xl font-bold">{post.title}</h1>
-      <p className="mt-4">{post.content}</p>
-    </div>
+    <article className="prose dark:prose-invert max-w-3xl mx-auto px-6 py-16">
+      <h1 className="text-4xl font-bold">{post.title}</h1>
+      <p className="text-sm text-gray-500 mb-8">{post.publishedAt}</p>
+      <div
+        dangerouslySetInnerHTML={{ __html: post.content }}
+        className="text-base"
+      />
+    </article>
   );
 }

@@ -1,36 +1,83 @@
-// src/app/projects/[slug]/page.tsx
+import { Metadata } from "next";
 
-import { notFound } from 'next/navigation';
-import { ProjectType } from '@/types/ProjectType';
-import Image from 'next/image';
-
-type Props = {
-  params: Promise<{ slug: string }>;
+type Project = {
+  _id: string;
+  title: string;
+  description: string;
+  content?: string;
+  techStack?: string[];
+  image?: string;
+  github?: string;
+  liveDemo?: string;
 };
 
-export default async function ProjectPage({ params }: Props) {
-  const { slug } = await params;
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/projects/${params.slug}`);
+  const project: Project = await res.json();
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/projects/${slug}`, {
-    cache: 'no-store',
+  return {
+    title: `${project.title} – Mahafuj Ahamed`,
+    description: project.description,
+  };
+}
+
+export default async function ProjectDetail({ params }: { params: { slug: string } }) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/projects/${params.slug}`, {
+    cache: "no-store",
   });
 
-  if (!res.ok) return notFound();
+  if (!res.ok) {
+    return <div className="text-center py-20 text-red-600">Project not found</div>;
+  }
 
-  const project: ProjectType = await res.json();
+  const project: Project = await res.json();
 
   return (
-    <main className="max-w-4xl mx-auto py-12 px-4">
-      <h1 className="text-4xl font-bold mb-6">{project.title}</h1>
-      <Image
-        src={project.imageUrls?.[0] || '/placeholder.jpg'}
-        alt={project.title}
-        width={800}
-        height={450}
-        className="rounded-xl object-cover w-full"
-        priority
-      />
-      <p className="mt-6 text-lg text-gray-700">{project.description}</p>
+    <main className="max-w-4xl mx-auto px-6 py-16 space-y-6">
+      <h1 className="text-4xl font-bold">{project.title}</h1>
+
+      {project.image && (
+        <img src={project.image} alt={project.title} className="rounded-lg w-full max-h-[400px] object-cover" />
+      )}
+
+      <p className="text-lg text-gray-700">{project.description}</p>
+
+      {project.techStack && (
+        <ul className="flex flex-wrap gap-2 text-sm text-indigo-600 font-medium">
+          {project.techStack.map((tech, idx) => (
+            <li key={idx} className="bg-indigo-100 px-2 py-1 rounded">{tech}</li>
+          ))}
+        </ul>
+      )}
+
+      {project.content && (
+        <div className="prose max-w-none mt-6">
+          <p>{project.content}</p>
+        </div>
+      )}
+
+      <div className="flex gap-4 mt-6">
+        {project.github && (
+          <a
+            href={project.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
+            View Code
+          </a>
+        )}
+        {project.liveDemo && (
+          <a
+            href={project.liveDemo}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-green-600 underline"
+          >
+            Live Demo
+          </a>
+        )}
+      </div>
     </main>
   );
 }

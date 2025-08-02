@@ -1,51 +1,70 @@
-// src/app/projects/page.tsx
+import { Metadata } from "next";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { ProjectType } from '@/types/ProjectType';
+export const metadata: Metadata = {
+  title: "Projects – Mahafuj Ahamed",
+  description: "Explore Mahafuj Ahamed's blockchain projects, including smart contracts, dApps, NFT platforms, and decentralized protocols.",
+};
 
-export const dynamic = 'force-dynamic';
+type Project = {
+  _id: string;
+  title: string;
+  description: string;
+  image?: string;
+  techStack?: string[];
+  github?: string;
+  liveDemo?: string;
+};
 
 export default async function ProjectsPage() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/projects`, {
-    cache: 'no-store',
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/projects`, {
+    cache: "no-store",
   });
 
-  if (!res.ok) {
-    return (
-      <div className="text-center mt-10 text-red-500">
-        Failed to load projects.
-      </div>
-    );
-  }
-
-  const projects: ProjectType[] = await res.json();
+  const projects: Project[] = await res.json();
 
   return (
-    <div className="max-w-6xl mx-auto p-8">
-      <h1 className="text-4xl font-bold mb-8">Projects</h1>
-
-      <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+    <main className="max-w-6xl mx-auto px-6 py-16">
+      <h1 className="text-4xl font-bold mb-10 text-center">My Blockchain Projects</h1>
+      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {projects.map((project) => (
-          <Link
-            key={project._id}
-            href={`/projects/${project.slug}`}
-            className="border rounded-xl p-4 hover:shadow-lg transition"
-          >
-            <Image
-              src={project.imageUrls?.[0] || '/placeholder.jpg'}
-              alt={project.title}
-              width={500}
-              height={300}
-              className="w-full h-48 object-cover rounded-lg mb-4"
-            />
+          <div key={project._id} className="border rounded-xl p-6 shadow-md hover:shadow-lg transition">
+            {project.image && (
+              <img src={project.image} alt={project.title} className="rounded-lg mb-4 object-cover h-40 w-full" />
+            )}
             <h2 className="text-xl font-semibold mb-2">{project.title}</h2>
-            <p className="text-gray-600 line-clamp-3">
-              {project.description}
-            </p>
-          </Link>
+            <p className="text-gray-600 mb-4">{project.description}</p>
+            {project.techStack && (
+              <ul className="flex flex-wrap gap-2 text-sm text-indigo-600 font-medium">
+                {project.techStack.map((tech, idx) => (
+                  <li key={idx} className="bg-indigo-100 px-2 py-1 rounded">{tech}</li>
+                ))}
+              </ul>
+            )}
+            <div className="flex gap-4 mt-4">
+              {project.github && (
+                <a
+                  href={project.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-blue-600 underline"
+                >
+                  GitHub
+                </a>
+              )}
+              {project.liveDemo && (
+                <a
+                  href={project.liveDemo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-green-600 underline"
+                >
+                  Live Demo
+                </a>
+              )}
+            </div>
+          </div>
         ))}
       </div>
-    </div>
+    </main>
   );
 }
