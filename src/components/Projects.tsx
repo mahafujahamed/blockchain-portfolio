@@ -20,9 +20,16 @@ const Projects = () => {
 
   useEffect(() => {
     const fetchProjects = async () => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects`);
-      const data = await res.json();
-      setProjects(data.projects);
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/projects`);
+        if (!res.ok) throw new Error("Failed to fetch projects");
+        const data = await res.json();
+        // Defensive: if data.projects exists, use it, else fallback to data
+        setProjects(Array.isArray(data.projects) ? data.projects : data);
+      } catch (error) {
+        console.error("Failed to fetch projects", error);
+        setProjects([]);
+      }
     };
     fetchProjects();
   }, []);

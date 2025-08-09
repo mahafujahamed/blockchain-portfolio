@@ -16,9 +16,17 @@ if (!API_BASE) {
 export async function getAllPosts(page = 1, limit = 6) {
   const url = `${API_BASE}/api/blog?page=${page}&limit=${limit}`;
   const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Failed to fetch blog posts (${res.status})`);
-  return res.json();
+  if (!res.ok) {
+    throw new Error(`Failed to fetch blog posts (${res.status})`);
+  }
+  const data = await res.json();
+  // Defensive fallback
+  if (!data.posts || !Array.isArray(data.posts)) {
+    return { posts: [], total: 0 };
+  }
+  return data;
 }
+
 
 export async function getPostBySlug(slug: string) {
   const url = `${API_BASE}/api/blog/${encodeURIComponent(slug)}`;

@@ -7,31 +7,32 @@ import { onAuthStateChanged, getIdToken } from "firebase/auth";
 import Sidebar from "@/components/admin/Sidebar";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const [loading, setLoading] = useState(true);
+  const [checking, setChecking] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        router.push("/admin/login");
+        localStorage.removeItem("token");
+        router.replace("/admin/login");
       } else {
-        const token = await getIdToken(user);
+        // ensure token exists/refresh token
+        const token = await getIdToken(user, true);
         localStorage.setItem("token", token);
-        setLoading(false);
+        setChecking(false);
       }
     });
-
-    return () => unsubscribe();
+    return () => unsub();
   }, [router]);
 
-  if (loading) {
-    return <div className="p-10 text-center">Checking admin access...</div>;
+  if (checking) {
+    return <div className="p-6">Checking admin session...</div>;
   }
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 p-6 overflow-y-auto">{children}</main>
+      <main className="flex-1 p-6 bg-gray-50 dark:bg-zinc-900">{children}</main>
     </div>
   );
 }

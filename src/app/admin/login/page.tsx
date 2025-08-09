@@ -1,42 +1,67 @@
-'use client';
-import { useState, useEffect } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
-import { useRouter } from 'next/navigation';
+// src/app/admin/login/page.tsx
+"use client";
 
-export default function AdminLoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+import { useState } from "react";
+import { signInWithEmailAndPassword, getIdToken } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { auth } from "@/lib/firebase";
+
+export default function AdminLogin() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
 
-  useEffect(() => {
-    auth.onAuthStateChanged((user) => {
-      if (user) router.replace('/admin/dashboard');
-    });
-  }, [router]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setError("");
+
     try {
-      const userCred = await signInWithEmailAndPassword(auth, email, password);
-      const token = await userCred.user.getIdToken();
-      localStorage.setItem('token', token);
-      router.replace('/admin/dashboard');
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const token = await getIdToken(userCredential.user);
+
+      // Save token to localStorage (or cookie if you prefer server validation)
+      localStorage.setItem("adminToken", token);
+
+      router.push("/admin/dashboard");
     } catch (err: any) {
-      setError(err.code || 'Login failed');
+      setError(err.message || "Login failed");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 space-y-4">
-      {error && <p className="text-red-500">{error}</p>}
-      <input type="email" placeholder="Email" value={email}
-        onChange={(e) => setEmail(e.target.value)} required className="input" />
-      <input type="password" placeholder="Password" value={password}
-        onChange={(e) => setPassword(e.target.value)} required className="input" />
-      <button type="submit" className="btn">Login</button>
-    </form>
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900">
+      <form
+        onSubmit={handleLogin}
+        className="w-full max-w-sm bg-white dark:bg-gray-800 p-6 rounded-lg shadow"
+      >
+        <h2 className="text-2xl font-bold mb-4 text-center text-gray-800 dark:text-white">
+          Admin Login
+        </h2>
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full p-2 mb-4 border rounded"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full p-2 mb-4 border rounded"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        >
+          Login
+        </button>
+      </form>
+    </div>
   );
 }

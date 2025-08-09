@@ -1,94 +1,77 @@
+// src/app/admin/posts/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
-import { Trash2, Pencil, Plus } from "lucide-react";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function AdminPostsPage() {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchPosts = async () => {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${API_BASE}/api/blog`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    setPosts(data);
-    setLoading(false);
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this post?")) return;
-
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${API_BASE}/api/blog/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    if (res.ok) {
-      setPosts((prev) => prev.filter((post: any) => post._id !== id));
-    }
-  };
+  const { token } = useAuth();
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    if (!token) return;
+    setLoading(true);
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/blog?page=1&limit=100`, {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
+    })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`Failed (${res.status})`);
+        return res.json();
+      })
+      .then((data) => {
+        // adapt if your API returns { posts, total }
+        setPosts(Array.isArray(data.posts) ? data.posts : data);
+      })
+      .catch((e) => setErr(e.message))
+      .finally(() => setLoading(false));
+  }, [token]);
+
+  async function handleDelete(id: string) {
+    if (!confirm("Delete this post?")) return;
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/blog/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Delete failed");
+      setPosts((p) => p.filter((x) => x._id !== id));
+    } catch (e: any) {
+      alert(e.message || "Delete failed");
+    }
+  }
+
+  if (!token) return <p>Please log in to manage posts.</p>;
+  if (loading) return <p>Loading posts...</p>;
+  if (err) return <p className="text-red-600">{err}</p>;
+  if (!posts.length) return <p>No posts found</p>;
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">All Posts</h1>
-        <Link
-          href="/admin/posts/new"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 inline-flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" /> New Post
-        </Link>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Posts</h2>
+        <Link href="/admin/posts/create"><a className="px-3 py-1 bg-green-600 text-white rounded">Create Post</a></Link>
       </div>
 
-      {loading ? (
-        <p>Loading...</p>
-      ) : posts.length === 0 ? (
-        <p>No posts found.</p>
-      ) : (
-        <div className="overflow-x-auto border rounded-lg">
-          <table className="min-w-full text-sm">
-            <thead className="bg-zinc-100 dark:bg-zinc-800">
-              <tr>
-                <th className="px-4 py-2 text-left">Title</th>
-                <th className="px-4 py-2 text-left">Tags</th>
-                <th className="px-4 py-2 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {posts.map((post: any) => (
-                <tr key={post._id} className="border-t">
-                  <td className="px-4 py-2">{post.title}</td>
-                  <td className="px-4 py-2">{(post.tags || []).join(", ")}</td>
-                  <td className="px-4 py-2 flex gap-2">
-                    <Link
-                      href={`/admin/posts/edit/${post._id}`}
-                      className="text-blue-600 hover:underline"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(post._id)}
-                      className="text-red-600 hover:underline"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <ul className="space-y-3">
+        {posts.map((post) => (
+          <li key={post._id} className="p-4 bg-white dark:bg-neutral-800 rounded shadow">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="font-semibold">{post.title}</h3>
+                <p className="text-sm text-neutral-500">{post.excerpt ?? post.description}</p>
+              </div>
+              <div className="flex gap-2">
+                <Link href={`/admin/posts/${post._id}/edit`}><a className="text-blue-600">Edit</a></Link>
+                <button onClick={() => handleDelete(post._id)} className="text-red-600">Delete</button>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
