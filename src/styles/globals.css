@@ -2,7 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* You can add custom styles here */
-body {
-  @apply bg-white text-black dark:bg-black dark:text-white;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  .prose :where(a):not(:where([class~="not-prose"])) {
+    @apply text-blue-600 hover:underline dark:text-blue-400;
+  }
 }

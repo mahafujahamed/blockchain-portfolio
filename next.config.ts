@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: { ignoreDuringBuilds: true },
-};
+  reactStrictMode: true,
+  swcMinify: true,
+  experimental: {
+    serverActions: true,
+  },
+}
 
-export default nextConfig;
+module.exports = nextConfig

@@ -1,15 +1,16 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: 'class',
-  content: ["./src/**/*.{ts,tsx}"],
+  darkMode: "class",
+  content: [
+    './src/**/*.{js,ts,jsx,tsx}',
+  ],
   theme: {
     extend: {
-      colors: {
-        primary: '#0ea5e9', // Adjust to match your theme
-        'primary-light': '#38bdf8',
-      },
+      
     },
   },
-
-  plugins: [],
-};
+  plugins: [
+    require('@tailwindcss/typography'),
+    // you can add other plugins here
+  ],
+}

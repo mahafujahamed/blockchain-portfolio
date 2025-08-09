@@ -1,31 +1,33 @@
-'use client';
+// src/components/About.tsx
 
-import { motion } from 'framer-motion';
+"use client";
 
-export default function About() {
+import { motion } from "framer-motion";
+
+const About = () => {
   return (
-    <section className="py-16 bg-gray-100 dark:bg-gray-900">
-      <div className="max-w-4xl mx-auto px-4">
+    <section id="about" className="w-full py-20 bg-background text-foreground">
+      <div className="max-w-5xl mx-auto px-4">
         <motion.h2
-          className="text-3xl font-bold mb-6 text-center text-gray-900 dark:text-white"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
+          className="text-4xl font-bold text-center mb-8"
         >
           About Me
         </motion.h2>
         <motion.p
-          className="text-lg text-gray-700 dark:text-gray-300 text-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="text-lg leading-8 text-center text-muted-foreground"
         >
-          I&apos;m a passionate Blockchain Developer specializing in smart contracts,
-          decentralized applications (dApps), and Web3 integrations. I love building
-          secure, scalable blockchain solutions and exploring the future of decentralized
-          tech.
+          I’m a passionate <span className="text-primary font-medium">Blockchain Developer</span> with experience in building secure, decentralized applications using technologies like <span className="font-medium">Solidity, Web3.js, Ethers.js, Hardhat</span> and <span className="font-medium">Next.js</span>.  
+          I thrive in fast-paced environments and love contributing to open-source blockchain projects.
         </motion.p>
       </div>
     </section>
   );
-}
+};
+
+export default About;

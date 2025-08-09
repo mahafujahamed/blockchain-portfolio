@@ -1,8 +1,5 @@
-
 {
-  "functions": {
-    "middleware.ts": {
-      "runtime": "edge"
-    }
-  }
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://blockchain-portfolio-backend-bdf9.onrender.com/api/:path*" }
+  ]
 }
